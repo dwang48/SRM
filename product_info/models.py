@@ -14,6 +14,6 @@ class Product(models.Model):
     # ... [Add fields for the remaining columns with their corresponding verbose_name in Chinese]
 
     class Meta:
-        verbose_name = "产品信息"
-        verbose_name_plural = "产品信息"
+        verbose_name = "垂重产品信息"
+        verbose_name_plural = "垂重产品信息"
 

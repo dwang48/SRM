@@ -36,13 +36,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = '/static/'
 # 指定simpleui默认的主题,指定一个文件名，相对路径就从simpleui的theme目录读取
-SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'
+# SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'
 
 # SIMPLEUI_LOGO = 'images/logo.jpeg'
 SIMPLEUI_HOME_INFO=False
 SIMPLEUI_ANALYSIS = False
 
 ALLOWED_HOSTS = ['*']
+
+SIMPLEUI_DEFAULT_ICON = False
+SIMPLEUI_HOME_QUICK=False
 
 
 INSTALLED_APPS = [
@@ -61,6 +64,7 @@ INSTALLED_APPS = [
     "vendor_info",
     "material_price_info",
     "cost_analysis",
+    # "dynamic_schema",
 ]
 
 MIDDLEWARE = [

@@ -10,8 +10,8 @@ class MaterialPrice(models.Model):
     price_update_date = models.DateField(verbose_name="价格更新日期")
 
     class Meta:
-        verbose_name = "材料价格"
-        verbose_name_plural = "材料价格"
+        verbose_name = "垂重材料价格"
+        verbose_name_plural = "垂重材料价格"
 
     def __str__(self):
         return self.material_name

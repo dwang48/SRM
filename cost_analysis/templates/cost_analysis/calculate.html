@@ -1,0 +1,22 @@
+<form method="post">
+    {% csrf_token %}
+    <label>选择材料:</label>
+    <select name="selected_material">
+        {% for material in materials %}
+            <option value="{{ material.id }}">{{ material.material_name }}</option>
+        {% endfor %}
+    </select>
+
+    <label>产品毛重:</label>
+    <input type="text" name="product_gross_weight" required>
+
+    <label>产品净重:</label>
+    <input type="text" name="product_net_weight" required>
+
+    <input type="submit" value="计算">
+</form>
+
+{% if result %}
+    <h2>计算结果:</h2>
+    <p>{{ result }}</p>
+{% endif %}

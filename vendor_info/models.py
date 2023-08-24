@@ -11,7 +11,7 @@ class Vendor(models.Model):
     gas_price = models.FloatField(null=True, blank=True, verbose_name="燃气价（元/立方米）")
 
     class Meta:
-        verbose_name = "供应商信息"
+        verbose_name = "垂重供应商信息"
         verbose_name_plural = verbose_name
 
     def __str__(self):

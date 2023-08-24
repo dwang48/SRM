@@ -21,5 +21,6 @@ from django.contrib import admin
 urlpatterns = [
     path('', admin.site.urls),
     # path('excelapp/', include('excelapp.urls')),  # Include app URLs here
+    path('cost_analysis/', include('cost_analysis.urls')), # 这一行添加了 cost_analysis 的URLs
 ]
 
