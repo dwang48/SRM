@@ -14,3 +14,15 @@ class CostAnalysis(models.Model):
     def __str__(self):
         return self.产品描述
 
+
+
+class ProcessingMethod(models.Model):
+    name = models.CharField(max_length=255)
+    def calculate(self, *args, **kwargs):
+        if self.name == "剪板":
+            # Your shearing_method logic here
+            pass
+        elif self.name == "冲压":
+            # Your stamping_method logic here
+            pass
+        # ... and so on for other methods

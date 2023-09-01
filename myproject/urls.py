@@ -17,10 +17,15 @@ Including another URLconf
 from django.urls import path, include
 from django.contrib import admin
 
-
 urlpatterns = [
-    path('', admin.site.urls),
+    path('admin/', admin.site.urls),
     # path('excelapp/', include('excelapp.urls')),  # Include app URLs here
-    path('cost_analysis/', include('cost_analysis.urls')), # 这一行添加了 cost_analysis 的URLs
+    path('calculate/', include('cost_analysis.urls')), 
+    path('',include('home.urls'))
 ]
+
+admin.site.site_header = "洽兴报价管理系统"
+admin.site.site_title = "洽兴报价管理系统"
+admin.site.index_title = "欢迎使用洽兴报价管理系统"
+
 

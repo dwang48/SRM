@@ -32,9 +32,16 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'myproject/static'),
+]
 # Application definition
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = '/static/'
+SIMPLEUI = {
+    'logo': '/static/images/logo.jpeg',
+    # ... other configurations ...
+}
 # 指定simpleui默认的主题,指定一个文件名，相对路径就从simpleui的theme目录读取
 # SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'
 
@@ -64,6 +71,7 @@ INSTALLED_APPS = [
     "vendor_info",
     "material_price_info",
     "cost_analysis",
+    "home",
     # "dynamic_schema",
 ]
 

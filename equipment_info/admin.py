@@ -22,16 +22,22 @@ class EquipmentResource(resources.ModelResource):
             row["设备型号"] = "Unknown"  # or some default value
     class Meta:
         model = Equipment
-        skip_unchanged = True
-        report_skipped = True
+        # skip_unchanged = True
+        # report_skipped = True
         # exclude = ('id',)
-        import_id_fields = ["purchase_category",]
+        import_id_fields = ["purchase_category","manufacturing_process","equipment_name","equipment_model"]
         # fields = ('purchase_category', 'manufacturing_process', 'equipment_name', 'equipment_model', 'current_value', 'remaining_depreciation_years', 'power_kw', 'lubricating_oil_consumption', 'oil_price_per_kg',)
 
 @admin.register(Equipment)
 class EquipmentAdmin(ImportExportModelAdmin):
     resource_class = EquipmentResource
+    def formatted_equipment_name(self, obj):
+        return f"{obj.equipment_name} (Model: {obj.equipment_model})"
+    formatted_equipment_name.admin_order_field = 'equipment_name'  # Allows sorting by this field
+    formatted_equipment_name.short_description = 'Equipment'
     list_display = ['purchase_category', 'manufacturing_process', 'equipment_name', 'equipment_model', 'current_value', 'remaining_depreciation_years', 'power_kw', 'lubricating_oil_consumption', 'oil_price_per_kg',]
+    list_filter = ['purchase_category', 'manufacturing_process']
+    search_fields = ['equipment_name', 'equipment_model']
     # def get_instance(self, instance_loader, row):
     #     return False
 
@@ -52,11 +58,7 @@ class EquipmentResource2(resources.ModelResource):
             row["设备型号"] = "Unknown"  # or some default value
     class Meta:
         model = Equipment2
-        skip_unchanged = True
-        report_skipped = True
-        # exclude = ('id',)
         import_id_fields = ["purchase_category",]
-        # fields = ('purchase_category', 'manufacturing_process', 'equipment_name', 'equipment_model', 'current_value', 'remaining_depreciation_years', 'power_kw', 'lubricating_oil_consumption', 'oil_price_per_kg',)
 
 @admin.register(Equipment2)
 class EquipmentAdmin2(ImportExportModelAdmin):

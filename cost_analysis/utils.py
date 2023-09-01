@@ -1,88 +1,100 @@
-def tokenize(expression):
-    tokens = []
-    num = ''
-    for char in expression:
-        if char.isdigit():
-            num += char
-        else:
-            if num:
-                tokens.append(num)
-                num = ''
-            tokens.append(char)
-    if num:
-        tokens.append(num)
-    return tokens
+from material_price_info.models import MaterialPrice
+from equipment_info.models import Equipment
+from product_info.models import Product
+from vendor_info.models import Vendor
+from django.http import HttpResponse
 
-def to_postfix(tokens):
-    def precedence(op):
-        return {'+': 1, '-': 1, '*': 2, '/': 2}.get(op, 0)
 
-    output = []
-    operators = []
+# import requests
+
+class ProcessCost:
+    def __init__(self):
+        pass
+
+    #剪板
+    @staticmethod
+    def shearing_cost(设备现价值, 剩余折旧年数, 每小时产能, 设备功率, 电价, 操作员工资, 操作员人数):
+        a = (设备现价值 / 剩余折旧年数) / 365 / 24 / 每小时产能
+        b = (设备功率 * 电价) / 每小时产能
+        c = (操作员工资 / 21.5) * 操作员人数 / 24 / 每小时产能
+        return a + b + c
+
+    #冲压
+    @staticmethod
+    def stamping_cost(设备现价值, 剩余折旧年数, 每小时产能, 每小时消耗量, 单价, 设备功率, 电价, 操作员工资, 操作员人数):
+        e = (设备现价值 / 剩余折旧年数) / 365 / 24 / 每小时产能
+        f = 每小时消耗量 * 单价 / 每小时产能
+        g = (设备功率 * 电价) / 每小时产能
+        h = (操作员工资 / 21.5) * 操作员人数 / 24 / 每小时产能
+        return e + f + g + h
+
+    #表面加工处理
+    @staticmethod
+    def surface_cost(单价每公斤, 产品净重):
+        j = (单价每公斤 / 1000) * 产品净重
+        return j
     
-    for token in tokens:
-        if token.isdigit():
-            output.append(token)
-        elif token in "+-*/":
-            while operators and precedence(operators[-1]) >= precedence(token):
-                output.append(operators.pop())
-            operators.append(token)
-        elif token == '(':
-            operators.append(token)
-        elif token == ')':
-            while operators and operators[-1] != '(':
-                output.append(operators.pop())
-            operators.pop()  # remove the '('
 
-    while operators:
-        output.append(operators.pop())
-        
-    return output
+class PackagingCost:
+    def __init__(self):
+        pass
 
-def evaluate_postfix(postfix_tokens):
-    stack = []
-    for token in postfix_tokens:
-        if token.isdigit():
-            stack.append(int(token))
-        else:
-            b = stack.pop()
-            a = stack.pop()
-            if token == '+':
-                stack.append(a + b)
-            elif token == '-':
-                stack.append(a - b)
-            elif token == '*':
-                stack.append(a * b)
-            elif token == '/':
-                stack.append(a / b)
-    return stack[0]
+    @staticmethod
+    def calculate(纸箱价格, 每箱包装量, PE袋价格, 每袋包装量, 操作员工资, 操作员人数, 包装每小时产能):
+        k = 纸箱价格 / 每箱包装量
+        l = PE袋价格 / 每袋包装量
+        m = (操作员工资 / 21.5) * 操作员人数 / 24 / 包装每小时产能
+        return k + l + m
 
-def evaluate_expression(expression):
-    tokens = tokenize(expression)
-    postfix_tokens = to_postfix(tokens)
-    return evaluate_postfix(postfix_tokens)
+class ShippingCost:
+    def __init__(self):
+        pass
 
-# Test
-def tokenize_variables(expression):
-    tokens = []
-    term = ''
-    for char in expression:
-        if char.isalnum() or char == '_':  # Considering terms can have underscores
-            term += char
-        else:
-            if term:
-                tokens.append(term)
-                term = ''
-            tokens.append(char)
-    if term:
-        tokens.append(term)
+    @staticmethod
+    def calculate(每车运费, 每车箱数, 每箱包装量):
+        return 每车运费 / 每车箱数 / 每箱包装量
     
-    # Extract variables (non-numeric terms) from tokens
-    variables = [token for token in tokens if not (token.isdigit() or token in "+-*/()")]
-    
-    return tokens, variables
+def fullwidth_to_halfwidth(s):
+    """Convert full-width characters to half-width characters."""
+    result = []
+    for char in s:
+        code_point = ord(char)
+        # Convert full-width characters to half-width characters
+        if 0xFF01 <= code_point <= 0xFF5E:
+            code_point -= 0xFEE0
+        # Convert full-width space to half-width space
+        elif code_point == 0x3000:
+            code_point = 0x0020
+        result.append(chr(code_point))
+    return ''.join(result)
 
-# expression = "产品毛重*(原材料价格/1000000)-(产品毛重-产品净重)*废料价格/1000000"
-# tokens, variables = tokenize_variables(expression)
-# variables
 
+def calculate_shearing_cost(request):
+    try:
+        # Assuming that you get the equipment name and model from the request or some other source
+        equipment_name = request.GET.get('equipment_name')
+        equipment_model = request.GET.get('equipment_model')
+
+        # Fetching the equipment information from the Equipment model
+        equipment_info = Equipment.objects.get(设备名称=equipment_name, 设备型号=equipment_model)
+
+        # Fetching other required parameters from the database
+        设备现价值 = equipment_info.设备现价值
+        剩余折旧年数 = equipment_info.剩余折旧年数
+        每小时产能 = equipment_info.每小时产能
+        设备功率 = equipment_info.设备功率
+        电价 = equipment_info.电价
+        操作员工资 = equipment_info.操作员工资
+        操作员人数 = equipment_info.操作员人数
+
+        # Calculate shearing cost using the extracted parameters
+        shearing_cost_result = ProcessCost.shearing_cost(设备现价值, 剩余折旧年数, 每小时产能, 设备功率, 电价, 操作员工资, 操作员人数)
+
+        # Render the result to a template or just return it as HttpResponse
+        return HttpResponse(str(shearing_cost_result))
+
+    except Equipment.DoesNotExist:
+        return HttpResponse("设备信息不存在", status=400)
+    except Exception as e:
+        # Handle other potential exceptions
+        return HttpResponse(f"发生了一个错误: {str(e)}", status=500)
