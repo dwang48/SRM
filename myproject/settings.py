@@ -39,7 +39,7 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = '/static/'
 SIMPLEUI = {
-    'logo': '/static/images/logo.jpeg',
+    'logo': '/static/images/shyahsin.jpeg',
     # ... other configurations ...
 }
 # 指定simpleui默认的主题,指定一个文件名，相对路径就从simpleui的theme目录读取

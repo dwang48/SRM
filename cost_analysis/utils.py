@@ -7,6 +7,27 @@ from django.http import HttpResponse
 
 # import requests
 
+class MaterialCost:
+    @staticmethod
+    def calculate(product_gross_weight, material_price, product_net_weight, scrap_price):
+        """
+        Calculate the material cost based on the provided formula.
+
+        Parameters:
+        - product_gross_weight: 产品毛重
+        - material_price: 原材料价格
+        - product_net_weight: 产品净重
+        - scrap_price: 废料价格
+
+        Returns:
+        - material_cost: Calculated material cost
+        """
+        material_cost = product_gross_weight * (material_price / 1000000) - (product_gross_weight - product_net_weight) * (scrap_price / 1000000)
+        return material_cost
+
+
+
+
 class ProcessCost:
     def __init__(self):
         pass
@@ -34,6 +55,19 @@ class ProcessCost:
         j = (单价每公斤 / 1000) * 产品净重
         return j
     
+def calculate_processing_cost(request):
+
+    selected_methods = request.POST.getlist('processing_methods[]')
+    method_mapping ={
+        '剪板': ProcessCost.shearing_cost,
+        '冲压': ProcessCost.stamping_cost,
+        '表面加工处理': ProcessCost.surface_cost,
+    }
+    print("选中的加工方法: " + ", ".join(selected_methods))
+
+
+
+
 
 class PackagingCost:
     def __init__(self):
@@ -67,34 +101,4 @@ def fullwidth_to_halfwidth(s):
             code_point = 0x0020
         result.append(chr(code_point))
     return ''.join(result)
-
-
-def calculate_shearing_cost(request):
-    try:
-        # Assuming that you get the equipment name and model from the request or some other source
-        equipment_name = request.GET.get('equipment_name')
-        equipment_model = request.GET.get('equipment_model')
-
-        # Fetching the equipment information from the Equipment model
-        equipment_info = Equipment.objects.get(设备名称=equipment_name, 设备型号=equipment_model)
-
-        # Fetching other required parameters from the database
-        设备现价值 = equipment_info.设备现价值
-        剩余折旧年数 = equipment_info.剩余折旧年数
-        每小时产能 = equipment_info.每小时产能
-        设备功率 = equipment_info.设备功率
-        电价 = equipment_info.电价
-        操作员工资 = equipment_info.操作员工资
-        操作员人数 = equipment_info.操作员人数
-
-        # Calculate shearing cost using the extracted parameters
-        shearing_cost_result = ProcessCost.shearing_cost(设备现价值, 剩余折旧年数, 每小时产能, 设备功率, 电价, 操作员工资, 操作员人数)
-
-        # Render the result to a template or just return it as HttpResponse
-        return HttpResponse(str(shearing_cost_result))
-
-    except Equipment.DoesNotExist:
-        return HttpResponse("设备信息不存在", status=400)
-    except Exception as e:
-        # Handle other potential exceptions
-        return HttpResponse(f"发生了一个错误: {str(e)}", status=500)
+    

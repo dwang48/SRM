@@ -4,7 +4,7 @@ from django.shortcuts import render
 #     return render(request, 'home/home.html')
 
 def choose_category(request):
-    category_choices = [('塑料成品', '塑料成品'),
+   category_choices = [('塑料成品', '塑料成品'),
  ('注塑', '注塑'),
  ('喷涂', '喷涂'),
  ('电镀', '电镀'),
@@ -38,4 +38,4 @@ def choose_category(request):
  ('镜片', '镜片'),
  ('胶头', '胶头'),
  ('刷毛', '刷毛')]
-    return render(request,'home/home.html',{'category_choices':category_choices,})
+   return render(request,'home/home.html',{'category_choices':category_choices,})

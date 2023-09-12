@@ -6,136 +6,111 @@
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'cost_analysis/styles.css' %}">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     </head>
     <body class="bg-gray-100 antialiased">
-
+        
+        
     <div class="flex items-center justify-center mt-8">
         <h1 class="text-4xl font-bold">成本计算</h1>
     </div>
 
-    <div class="container mx-auto mt-10 px-4">
-    <div class="mb-4">
-        <label class="block text-md font-semibold mb-2">选择零件编号:</label>
-        <select name="selected_product" class="block w-full border rounded-lg py-2 px-3 leading-tight">
-            {% for product in products %}
-                <option value="{{ product.id }}" {% if product.id|stringformat:"s" == request.POST.selected_product %}selected{% endif %}>
-                    {{ product.part_number }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
-</div>
-
-
-{% if selected_product_details %}
-    <div class="mb-4">
-        <h3 class="text-lg font-semibold mb-2">所选产品的详细信息:</h3>
-        <ul>
-            {% for key, value in selected_product_details.items %}
-                <li>{{ key }}: {{ value }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endif %}
-
+    <div class="container mx-auto mt-10 px-4ß">
+        <form method="post" action="{% url 'calculate_chuizhong' %}" id="form1">
+            {% csrf_token %}
+            
+            <!-- 添加一个隐藏的输入字段来标识此表单 -->
+            <input type="hidden" name="form_name" value="form1">
     
-    
-
-    
-    <div class="container mx-auto mt-10 px-4">
-    
-        <div class="mt-6">
-            <h2 class="text-2xl font-bold mb-4">材料费用计算</h2>
-            <form method="post" class="bg-white p-6 rounded-xl shadow-md">
-                {% csrf_token %}
-                <div class="mb-4">
-                    <label class="block text-md font-semibold mb-2">选择材料:</label>
-                    <select name="selected_material" class="block w-full border rounded-lg py-2 px-3 leading-tight focus:border-blue-300">
-                        {% for material in materials %}
-                            <option value="{{ material.id }}" {% if material.id|stringformat:"s" == request.POST.selected_material %}selected{% endif %}>
-                                {{ material.material_name }}
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-2">选择零件编号:</h3>
+                <select name="selected_product" class="block w-full border rounded-lg py-2 px-3 leading-tight">
+                    {% for product in products %}
+                        <option value="{{ product.id }}" {% if product.id|stringformat:"s" == request.POST.selected_product %}selected{% endif %}>
+                            {{ product.part_number }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-2">选择材料:</h3>
+                <select name="selected_material" class="block w-full border rounded-lg py-2 px-3 leading-tight focus:border-blue-300">
+                    {% for material in materials %}
+                        <option value="{{ material.id }}" {% if material.id|stringformat:"s" == request.POST.selected_material %}selected{% endif %}>
+                            {{ material.material_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div id="processing-methods" class="mb-6">
+                <div class="processing-method">
+                    <h3 class="text-lg font-semibold mb-2">选择加工方式:</h3>
+                    <!-- <select name="processing_methods[]" class="processing-method-select block w-full border rounded py-2 px-3 leading-tight" multiple>
+                        {% for method in processing_methods %}
+                            <option value="{{ method.id }}">{{ method.加工方法 }}</option>
+                        {% endfor %}
+                    </select> -->
+                    <select name="processing_methods[]" class="processing-method-select block w-full border rounded py-2 px-3 leading-tight" multiple>
+                        {% for method in processing_methods %}
+                            <option value="{{ method.id }}" {% if method.id|stringformat:"s" in selected_methods %}selected{% endif %}>
+                                {{ method.加工方法 }}
                             </option>
                         {% endfor %}
                     </select>
-                </div>
-    
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-2">产品毛重(吨):</label>
-                    <input type="text" name="product_gross_weight" value="{{ request.POST.product_gross_weight }}" required class="block w-full border rounded py-2 px-3 leading-tight">
-                </div>
-    
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-2">产品净重(吨):</label>
-                    <input type="text" name="product_net_weight" value="{{ request.POST.product_net_weight }}" required class="block w-full border rounded py-2 px-3 leading-tight">
-                </div>
-    
-                <input type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-blue" value="计算">
-            </form>
-            
-            {% if result %}
-                <h4 class="mt-4 text-lg font-semibold">计算结果:</h4>
-                <p class="mb-2"><strong>原始公式:</strong> {{ original_formula }}</p>
-                <p class="mb-2"><strong>带数值的公式:</strong> {{ substituted_formula }}</p>
-                <p><strong>结果:</strong> {{ result }}</p>
-            {% endif %}
-        </div>
-    
-        <div class="mt-6">
-            <h2 class="text-2xl font-bold mb-4">加工费</h2>
-            <div id="processing-methods" class="mb-4">
-                <div class="processing-method">
-                    <label class="block text-sm font-semibold mb-2">选择加工方式:</label>
-                    <select name="processing_method[]" class="processing-method-select block w-full border rounded py-2 px-3 leading-tight">
-                        {% for method in processing_methods %}
-                            <option value="{{ method.id }}">{{ method.name }}</option>
-                        {% endfor %}
-                    </select>
+                    
+                    <!-- <button class="remove-method bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline-red">
+                        删除
+                    </button> -->
                 </div>
             </div>
-            <button type="button" id="add-processing-method" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline-blue">
-                +
-            </button>
-        </div>
-        
+            
+            <div class="mb-4">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    计算
+                </button>
+            </div>
+        </form>
+    </div>
     
+    <div class="container mx-auto mt-10 px-4">
+        <div class="mt-6">
+            <h2 class="text-2xl font-bold">材料费</h2>
+            {% if material_result %}
+                <h4 class="mt-4 text-lg font-semibold">计算结果:</h4>
+                <p><strong>结果:</strong> {{ material_result }}</p>
+            {% endif %}
+
+        </div>
         <div class="mt-6">
             <h2 class="text-2xl font-bold">包装费</h2>
-            <label class="block text-sm font-semibold mb-2">包装方式:</label>
-            <select name="packaging_method" class="block w-full border rounded py-2 px-3 leading-tight">
-                <!-- Database content goes here -->
-            </select>
+            {% if packaging_result %}
+                <h4 class="mt-4 text-lg font-semibold">计算结果:</h4>
+                <p><strong>结果:</strong> {{ packaging_result }}</p>
+            {% endif %}
+
         </div>
     
         <div class="mt-6">
             <h2 class="text-2xl font-bold">运输费</h2>
-            <label class="block text-sm font-semibold mb-2">运输方式:</label>
-            <select name="transport_method" class="block w-full border rounded py-2 px-3 leading -tight">
-                <!-- Database content goes here -->
-            </select>
+            {% if shipping_result %}
+                <h4 class="mt-4 text-lg font-semibold">计算结果:</h4>
+                <p><strong>结果:</strong> {{ shipping_result }}</p>
+            {% endif %}
         </div>
 
+    
+        <div class="mt-6">
+            <h2 class="text-2xl font-bold mb-4">加工费</h2>
+            {% if processing_result %}
+                <h4 class="mt-4 text-lg font-semibold">计算结果:</h4>
+                <p><strong>结果:</strong> {{ processing_result }}</p>
+            {% endif %}
+        </div>        
+
             <div class="mt-6">
-                <h2 class="text-2xl font-bold">总成本</h2>
-                <form method="post" class="bg-white p-4 rounded shadow-lg ml-8">
-                    {% csrf_token %}
-                    <div class="flex justify-between mb-4">
-                        <!-- 管理费比例 -->
-                        <div class="w-1/2 pr-2">
-                            <label class="block text-sm font-semibold mb-2">管理费比例:</label>
-                            <input type="text" name="management_fee_percentage" value="{{ request.POST.management_fee_percentage }}" required class="block w-full border rounded py-2 px-3 leading-tight">
-                        </div>
-                        
-                        <!-- 利润率 -->
-                        <div class="w-1/2 pl-2">
-                            <label class="block text-sm font-semibold mb-2">利润率:</label>
-                            <input type="text" name="profit_margin_percentage" value="{{ request.POST.profit_margin_percentage }}" required class="block w-full border rounded py-2 px-3 leading-tight">
-                        </div>
-                    </div>
-                    
-                    <input type="submit" value="计算" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline-blue">
-                </form>
+                <h2 class="text-2xl font-bold mb-4">总成本</h2>
             
         
             {% if total_cost %}
@@ -145,36 +120,30 @@
         </div>
     </div>
 
-    
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+        const name = getURLParameter('name');
+        if (name) {
+            const titleElement = document.querySelector('h1');
+            titleElement.textContent = `${name}成本计算`;
+        }
+    });
+</script>
+
     <script>
         $(document).ready(function() {
-            $('select[name="selected_category"]').select2();
+            $('select').select2();  // 初始化所有的下拉菜单
         });
     </script>
     <script>
         function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20')) || null;
 }
-
-// 当页面加载时，读取 'name' 参数，并更新标题
-window.addEventListener('DOMContentLoaded', (event) => {
-    const name = getURLParameter('name');
-    if (name) {
-        const titleElement = document.querySelector('h1');
-        titleElement.textContent = `${name}成本计算`;
-    }
-});
-    </script>>
-    <script>
-        document.getElementById("add-processing-method").addEventListener("click", function() {
-            let newMethodDiv = document.querySelector(".processing-method").cloneNode(true);
-            document.getElementById("processing-methods").appendChild(newMethodDiv);
-        });
     </script>
-</body>
 
+
+
+
+</body>
 </html>
         
-
-    
-    
