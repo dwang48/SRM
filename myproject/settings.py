@@ -51,7 +51,7 @@ SIMPLEUI_ANALYSIS = False
 
 ALLOWED_HOSTS = ['*']
 
-SIMPLEUI_DEFAULT_ICON = False
+SIMPLEUI_DEFAULT_ICON = True
 SIMPLEUI_HOME_QUICK=False
 
 
@@ -63,8 +63,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # 'excelapp',
-    # "employee",#for testing
     "product_info",
     "import_export",
     "equipment_info",
@@ -72,7 +70,7 @@ INSTALLED_APPS = [
     "material_price_info",
     "cost_analysis",
     "home",
-    # "dynamic_schema",
+    "processing_info",
 ]
 
 MIDDLEWARE = [

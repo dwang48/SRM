@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>主页</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    
+    <style>
+      /* Optionally, you can add custom styles */
+      body {
+        font-family: "Arial", sans-serif; /* Replace with a more appealing font if needed */
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-100 h-screen">
+    <div class="absolute top-5 right-5">
+      <a
+        href="/admin/"
+        class="transition duration-300 ease-in-out transform hover:scale-105"
+      >
+        <button
+          class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-full text-xl"
+        >
+          管理员
+        </button>
+      </a>
+    </div>
+    <div class="flex h-screen justify-center items-center">
+      <div
+        class="w-full mx-auto max-w-lg bg-white p-6 rounded-xl shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+      >
+        <label class="block mx-auto text-xl font-bold mb-4 text-gray-800"
+          >选择品类:</label
+        >
+
+        <div class="text-center">
+          <select
+            id="categorySelect"
+            name="selected_category"
+            class="block w-3/4 mx-auto border rounded-lg py-3 px-4 text-lg leading-tight mb-8 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent mb-10"
+          >
+            {% for value, display_name in category_choices %}
+            <option value="{{ value }}">{{ display_name }}</option>
+            {% endfor %}
+          </select>
+
+          <!-- Confirm Button -->
+          <button
+            id="confirmBtn"
+            class="block w-3/4 mx-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent shadow-md mt-10"
+          >
+            确认
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const urlMappings = {
+        塑料成品: "/calculate/suliao",
+        注塑: "/calculate/zhusu",
+        喷涂: "/calculate/penwu",
+        电镀: "/calculate/diandu",
+        烫金: "/calculate/tangjin",
+        印刷: "/calculate/yinshua",
+        喷绘: "/calculate/penhui",
+        组装: "/calculate/zuzhuang",
+        冲压: "/calculate/chongya",
+        抛光: "/calculate/paoguang",
+        氧化: "/calculate/yanghua",
+        酸洗: "/calculate/suanxi",
+        刻字: "/calculate/kezi",
+        磁铁: "/calculate/citie",
+        垂重: "/calculate/chuizhong",
+        弹簧: "/calculate/tanhuan",
+        铝件成品: "/calculate/lvjianchengpin",
+        栈板: "/calculate/zhanban",
+        "纸箱/纸板": "/calculate/zhixiang",
+        包装袋: "/calculate/baozhuangdai",
+        彩盒: "/calculate/caihe",
+        吸塑盘: "/calculate/xisupan",
+        转印纸: "/calculate/zhuanyinzhi",
+        垫片: "/calculate/dianpian",
+        箔纸: "/calculate/bozhi",
+        标签: "/calculate/biaoqian",
+        收缩膜: "/calculate/shousuomo",
+        模架: "/calculate/mojia",
+        模芯: "/calculate/moxin",
+        玻璃管: "/calculate/boliguan",
+        棉头: "/calculate/miantou",
+        镜片: "/calculate/jingpian",
+        胶头: "/calculate/jiaotou",
+        刷毛: "/calculate/shuamao",
+      };
+
+      $(document).ready(function() {
+        const selectedValue = localStorage.getItem("selectedCategory");
+        if (selectedValue) {
+            $("#categorySelect").val(selectedValue).trigger("change");
+        }
+
+        $('select[name="selected_category"]').select2();
+        $(".select2-container").addClass("mb-6");
+
+        $("#categorySelect").on("change", function() {
+            const selectedValue = $(this).val();
+            localStorage.setItem("selectedCategory", selectedValue);
+        });
+    });
+
+    document.getElementById("confirmBtn").addEventListener("click", function() {
+        const selectedValue = document.getElementById("categorySelect").value;
+        const url = urlMappings[selectedValue];
+        if (url) {
+            window.location.href = `${url}?name=${encodeURIComponent(selectedValue)}`;
+        }
+    });
+    </script>
+
+    <script>
+      $("#categorySelect").on("change", function() {
+    const selectedValue = $(this).val();
+    localStorage.setItem("selectedCategory", selectedValue);
+    });
+  $(document).ready(function() {
+      const selectedValue = localStorage.getItem("selectedCategory");
+      if (selectedValue) {
+          $("#categorySelect").val(selectedValue).trigger("change");
+      }
+  });
+
+    </script>
+
+
+    <script>
+      $(document).ready(function () {
+        $('select[name="selected_category"]').select2();
+        $(".select2-container").addClass("mb-6");
+      });
+    </script>
+  </body>
+</html>

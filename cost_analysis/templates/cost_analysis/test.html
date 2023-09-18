@@ -1,0 +1,29 @@
+{%load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Particles.js Test</title>
+    <script src="{% static 'js/particles.js' %}"></script>
+    <style>
+        #particles-js {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles-js"></div>
+
+    <script>
+        particlesJS.load('particles-js', '{% static "js/particlesjs-config.json" %}', function() {
+            console.log('particles.js loaded - callback');
+        });
+    </script>
+
+</body>
+</html>

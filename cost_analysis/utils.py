@@ -1,4 +1,4 @@
-from material_price_info.models import MaterialPrice
+from material_price_info.models import *
 from equipment_info.models import Equipment
 from product_info.models import Product
 from vendor_info.models import Vendor
@@ -32,17 +32,18 @@ class ProcessCost:
     def __init__(self):
         pass
 
-    #剪板
+    #垂重
+    #无材料消耗类，仅考虑电费
     @staticmethod
-    def shearing_cost(设备现价值, 剩余折旧年数, 每小时产能, 设备功率, 电价, 操作员工资, 操作员人数):
+    def 无材料消耗类成本(设备现价值, 剩余折旧年数, 每小时产能, 设备功率, 电价, 操作员工资, 操作员人数):
         a = (设备现价值 / 剩余折旧年数) / 365 / 24 / 每小时产能
         b = (设备功率 * 电价) / 每小时产能
         c = (操作员工资 / 21.5) * 操作员人数 / 24 / 每小时产能
         return a + b + c
 
-    #冲压
+    #有材料消耗类
     @staticmethod
-    def stamping_cost(设备现价值, 剩余折旧年数, 每小时产能, 每小时消耗量, 单价, 设备功率, 电价, 操作员工资, 操作员人数):
+    def 有材料消耗类成本(设备现价值, 剩余折旧年数, 每小时产能, 每小时消耗量, 单价, 设备功率, 电价, 操作员工资, 操作员人数):
         e = (设备现价值 / 剩余折旧年数) / 365 / 24 / 每小时产能
         f = 每小时消耗量 * 单价 / 每小时产能
         g = (设备功率 * 电价) / 每小时产能
@@ -54,16 +55,6 @@ class ProcessCost:
     def surface_cost(单价每公斤, 产品净重):
         j = (单价每公斤 / 1000) * 产品净重
         return j
-    
-def calculate_processing_cost(request):
-
-    selected_methods = request.POST.getlist('processing_methods[]')
-    method_mapping ={
-        '剪板': ProcessCost.shearing_cost,
-        '冲压': ProcessCost.stamping_cost,
-        '表面加工处理': ProcessCost.surface_cost,
-    }
-    print("选中的加工方法: " + ", ".join(selected_methods))
 
 
 
@@ -76,9 +67,9 @@ class PackagingCost:
     @staticmethod
     def calculate(纸箱价格, 每箱包装量, PE袋价格, 每袋包装量, 操作员工资, 操作员人数, 包装每小时产能):
         k = 纸箱价格 / 每箱包装量
-        l = PE袋价格 / 每袋包装量
-        m = (操作员工资 / 21.5) * 操作员人数 / 24 / 包装每小时产能
-        return k + l + m
+        l = PE袋价格 / 每袋包装量 / 每箱包装量
+        # m = (操作员工资 / 21.5) * 操作员人数 / 24 / 包装每小时产能
+        return k + l
 
 class ShippingCost:
     def __init__(self):
@@ -101,4 +92,10 @@ def fullwidth_to_halfwidth(s):
             code_point = 0x0020
         result.append(chr(code_point))
     return ''.join(result)
+
+
+
+
+
+
     
