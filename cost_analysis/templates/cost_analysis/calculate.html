@@ -14,12 +14,17 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{% static 'js/particles.js' %}"></script>
     <!-- <script src="{% static 'js/app.js' %}"></script> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        .display-4 {
+            color: #fff;
+        }
         .narrow-container {
             max-width: 800px;  /* 设置你希望的最大宽度 */
         }
         .navbar.bg-primary, .btn-gradient, .bg-gradient {
             background: linear-gradient(to right, rgb(112, 151, 183), rgb(163, 154, 164));
+            opacity: 0.9;
         }
         .btn-gradient{
             color:white;
@@ -34,16 +39,24 @@
 
         body {
             /* background: linear-gradient(to bottom, #ffffff, #f1f1f1); */
-            background: radial-gradient(circle, #989898, #676666)
+            background: radial-gradient(circle, #000000, #ffffff)
         }
 
         body::before {
-        content: "";
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-image: url(data:image/png;base64,...);
-        opacity: 0.1;
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            /* background-image: url(data:image/png;base64,...); */
+            opacity: 0.2;
+        }
+        footer {
+            font-size: 20px;
+            color:#fff;
+        }
+        .card {
+            background: linear-gradient(to bottom, #ffffff, #f1f1f1);  /* 使用新的渐变颜色 */
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -60,7 +73,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a href="/admin/" class="nav-link">管理员</a>
+                    <a href="/admin/" class="nav-link fa-solid fa-user">管理员</a>
                 </li>
             </ul>
         </div>
@@ -88,17 +101,6 @@
                     </select>
                 </div>
 
-                <!-- <div class="form-group">
-                    <label>选择材料:</label>
-                    <select name="selected_material" class="form-control">
-                        {% for material in materials %}
-                        <option value="{{ material.id }}" {% if material.id|stringformat:"s" == request.POST.selected_material %}selected{% endif %}>
-                            {{ material.material_name }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div> -->
-
                 <div class="form-group">
                     <label>选择制造工艺、设备名称和设备型号:</label>
                     <select name="selected_equipment" class="form-control" multiple id="select2-equipment">
@@ -118,6 +120,10 @@
                         {% endfor %}
                     </select>
                 </div>
+
+                <div id="input-container">
+                    <!-- Dynamic inputs will be appended here -->
+                  </div>
                 
                 
                 
@@ -126,6 +132,7 @@
                     <button type="submit" class="btn btn-gradient btn-block">计算</button>
                 </div>
             </form>
+
         </div>
 
         <!-- Results Card -->
@@ -166,11 +173,6 @@
             </div>
         </div>
     </div>
-    <script>
-        particlesJS.load('particles-js', '{% static "js/particlesjs-config.json" %}', function() {
-          console.log('particles.js loaded - callback');
-        });
-    </script>
 
 
     <script>
@@ -189,6 +191,88 @@
 });
 </script>
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectElement = document.getElementById("select2-equipment");
+        const inputContainer = document.getElementById("input-container");
+
+        const addButton = document.createElement('button');
+        addButton.innerHTML = '<i class="fas fa-check"></i>';  // 使用Font Awesome图标
+        addButton.className = 'btn btn-primary'; // Bootstrap样式
+        addButton.type = 'button';
+        // addButton.style.marginBottom= '10px';
+        addButton.style.margin = '0 10px 10px 0';
+        addButton.addEventListener('click', function() {
+            addSelectedEquipments();
+        });
+        
+
+        const removeButton = document.createElement('button');
+        removeButton.innerHTML = '<i class="fas fa-trash"></i>'; // 使用Font Awesome图标
+        removeButton.className = 'btn btn-danger'; // Bootstrap样式
+        removeButton.type = 'button';
+        removeButton.style.marginBottom= '10px';
+        removeButton.addEventListener('click', function() {
+            removeSelectedEquipments();
+        });
+
+        inputContainer.appendChild(addButton);
+        inputContainer.appendChild(removeButton);
+
+        function addSelectedEquipments() {
+            const selectedOptions = Array.from(selectElement.selectedOptions);
+            
+            selectedOptions.forEach(option => {
+                const equipmentValue = option.value;
+                const label = option.textContent;
+                const inputGroup = document.createElement("div");
+                inputGroup.classList.add("input-group", "mb-3");
+                inputGroup.id = `group_${equipmentValue}`;
+                
+                inputGroup.innerHTML = `
+                    <div class="col-sm-4">
+                        <label>${label} 合格率:</label>
+                        <input type="number" class="form-control" name="qualification_rate_${equipmentValue}" placeholder="合格率(%)">
+                    </div>
+                    <div class="col-sm-3">
+                        <label>每小时产能:</label>
+                        <input type="number" class="form-control" name="hourly_capacity_${equipmentValue}" placeholder="每小时产能(个)">
+                    </div>
+                    <div class="col-sm-3">
+                        <label>工艺次数:</label>
+                        <input type="number" class="form-control" name="times_${equipmentValue}" placeholder="1">
+                    </div>
+                    <div class="col-sm-2 text-right">
+                        <button type="button" class="btn btn-danger mt-4" onclick="removeGroup('group_${equipmentValue}')">移除</button>
+                    </div>`;
+                inputContainer.appendChild(inputGroup);
+            });
+        }
+
+    function removeSelectedEquipments() {
+        const selectedOptions = Array.from(selectElement.selectedOptions);
+        
+        selectedOptions.forEach(option => {
+            const equipmentValue = option.value;
+            const inputGroup = document.getElementById(`group_${equipmentValue}`);
+            if (inputGroup) {
+                inputGroup.remove();
+            }
+        });
+    }
+
+    window.removeGroup = function(groupID) {
+        const inputGroup = document.getElementById(groupID);
+        if (inputGroup) {
+            inputGroup.remove();
+        }
+    }
+});
+
+
+    </script>
+
+<script>
+
 
 
 const name = getURLParameter('name');
@@ -231,10 +315,47 @@ window.addEventListener('DOMContentLoaded', (event) => {
         localStorage.setItem('selectedEquipment', JSON.stringify(selected));
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+            particlesJS.load('particles-js', '{% static "js/particles.json" %}', function() {
+                console.log('particles.js loaded - callback');
+            });
+        });
 </script>
 <!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.1/js/bootstrap.min.js"></script> -->
+
+<script>
+// 在已有的 DOMContentLoaded 函数内部添加以下内容
+document.addEventListener("DOMContentLoaded", function () {
+    // ...（你原有的代码）
+
+    const submitButton = document.querySelector("button[type='submit']"); // 获取已存在的提交按钮
+
+    submitButton.addEventListener('click', function (e) {
+        validateInputs(e);
+    });
+
+    function validateInputs(e) {
+        const inputGroups = document.querySelectorAll('.input-group');
+
+        for (const group of inputGroups) {
+            const qualificationInput = group.querySelector("input[name^='qualification_rate_']");
+            const hourlyCapacityInput = group.querySelector("input[name^='hourly_capacity_']");
+
+            if (!qualificationInput.value || !hourlyCapacityInput.value) {
+                alert('未输入每小时产能或合格率！');
+                e.preventDefault();
+                return;
+            }
+        }
+    }
+});
+
+
+</script>
+
 <footer class="mt-5">
     <div class="text-center">
         <p>&copy; Etale.ai. All rights reserved.</p>

@@ -8,6 +8,11 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.exceptions import ImproperlyConfigured
 from django.apps import apps
+from django.contrib import messages
+from django.http import HttpResponseRedirect,HttpResponse
+
+
+
 
 def calculate_processing_cost(request):
 
@@ -43,8 +48,23 @@ def calculate_processing_cost(request):
 
     for selected_equipment_data in selected_equipment_data_list:
         manufacturing_process, equipment_name, equipment_model = selected_equipment_data.split('|')
-        print('选中的加工方法：' + manufacturing_process)
+        if manufacturing_process == "表面加工处理":
+            continue
+        # print('选中的加工方法：' + manufacturing_process)
+        hourly_capacity_key = f"hourly_capacity_{manufacturing_process}|{equipment_name}|{equipment_model}"
+        qualified_rate_key = f"qualification_rate_{manufacturing_process}|{equipment_name}|{equipment_model}"
+        times_key = f"times_{manufacturing_process}|{equipment_name}|{equipment_model}"
+        hourly_capacity = request.POST.get(hourly_capacity_key, None)
+        qualified_rate = request.POST.get(qualified_rate_key, None)
+        times = request.POST.get(times_key, None)
 
+        hourly_capacity = float(hourly_capacity)
+        qualified_rate = float(qualified_rate)
+        if times == '':
+            times = 1
+        else:
+            times = int(times)
+        print(f"Received times: {times}")
         equipment = Equipment.objects.get(
             manufacturing_process=manufacturing_process,
             equipment_name=equipment_name,
@@ -55,33 +75,39 @@ def calculate_processing_cost(request):
             '冷镦':{
                 '设备现价值': equipment.current_value,
                 '剩余折旧年数': equipment.remaining_depreciation_years,
-                '每小时产能': product.hourly_capacity,
+                '每小时产能': hourly_capacity,
                 '每小时消耗量': equipment.lubricating_oil_consumption,
                 '单价': equipment.oil_price_per_kg,
                 '设备功率': equipment.power_kw,
                 '电价': vendor.electricity_price,
                 '操作员工资': vendor.operator_wages,
                 '操作员人数': product.operator_count,
+                '合格率': qualified_rate,
+                '次数': times,
             },
             '剪切': {
                 '设备现价值': equipment.current_value,
                 '剩余折旧年数': equipment.remaining_depreciation_years,
-                '每小时产能': product.hourly_capacity,
+                '每小时产能': hourly_capacity,
                 '设备功率': equipment.power_kw,
                 '电价': vendor.electricity_price,
                 '操作员工资': vendor.operator_wages,
                 '操作员人数': product.operator_count,
+                '合格率': qualified_rate,
+                '次数': times,
             },
             '冲压': {
                 '设备现价值': equipment.current_value,
                 '剩余折旧年数': equipment.remaining_depreciation_years,
-                '每小时产能': product.hourly_capacity,
+                '每小时产能': hourly_capacity,
                 '每小时消耗量': equipment.lubricating_oil_consumption,
                 '单价': equipment.oil_price_per_kg,
                 '设备功率': equipment.power_kw,
                 '电价': vendor.electricity_price,
                 '操作员工资': vendor.operator_wages,
                 '操作员人数': product.operator_count,
+                '合格率': qualified_rate,
+                '次数': times,
             },
             '表面加工处理': {
                 '单价每公斤': 3,
@@ -101,6 +127,7 @@ def calculate_processing_cost(request):
 
 def calculate_cost(request):
     category = request.path_info.split('/')[2]
+    selected_equipment_data_list = request.POST.getlist('selected_equipment')
 
     # 将首字母大写并拼接到 'MaterialPrice'
     model_name = f"{category.capitalize()}MaterialPrice"
@@ -170,15 +197,12 @@ def calculate_cost(request):
 
 
 
-        #计算材料费
-        # material_info = ModelClass.objects.get(id=selected_material)
-
         # 计算材料费
         material_result = MaterialCost.calculate(product_gross_weight,material_info.price,product_net_weight,material_info.scrap_price)
         # material_result_rounded = round(material_result,3)
 
         #计算包装费
-        packaging_result = PackagingCost.calculate(product_info.carton_price,product_info.pieces_per_carton,product_info.pe_bag_price,product_info.pieces_per_bag,vendor_info.operator_wages,product_info.operator_count,product_info.hourly_capacity)
+        packaging_result = PackagingCost.calculate(product_info.carton_price,product_info.pieces_per_carton,product_info.pe_bag_price,product_info.pieces_per_bag)
         # packaging_result_rounded = round(packaging_result,3)
 
         #计算运输费
@@ -189,7 +213,7 @@ def calculate_cost(request):
         # material_result_rounded = round(material_result,3)
 
         #显示加工费明细
-        # processing_details += ", ".join(selected_methods)
+        processing_details += ", ".join(selected_equipment_data_list)
 
 
         #计算总费用

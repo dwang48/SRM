@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
-from .models import Equipment
+# from .models import Equipment
 
 from import_export import resources, fields
 from .models import Equipment,Equipment2
