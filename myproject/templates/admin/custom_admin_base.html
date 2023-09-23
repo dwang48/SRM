@@ -1,0 +1,21 @@
+{% extends "admin/index.html" %}
+
+{% block extrahead %}
+    <script type="text/javascript">
+        // 在 DOM 加载完毕后执行
+        document.addEventListener("DOMContentLoaded", function() {
+            // 获取 header 栏
+            var header = document.getElementById("header");
+            if (header) {
+                // 创建新的按钮
+                var button = document.createElement("button");
+                button.innerHTML = "Go to Home";
+                button.onclick = function() {
+                    window.location.href = '/';
+                };
+                // 将按钮添加到 header
+                header.appendChild(button);
+            }
+        });
+    </script>
+{% endblock %}

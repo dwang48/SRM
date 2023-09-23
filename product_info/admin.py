@@ -4,6 +4,7 @@ from .models import Product
 from django.contrib import admin
 
 class ProductResource(resources.ModelResource):
+    categories = fields.Field(attribute='categories', column_name="类别")
     purchase_part = fields.Field(attribute='purchase_part', column_name="采购零件")
     part_number = fields.Field(attribute='part_number', column_name="零件编号")
     part_length = fields.Field(attribute='part_length', column_name="零件尺寸\n长（mm）")
@@ -46,7 +47,7 @@ class ProductResource(resources.ModelResource):
 # @admin.register(Product)
 class ProductAdmin(ImportExportModelAdmin):
     resource_class = ProductResource
-    list_display = (
+    list_display = ('categories',
         'purchase_part', 'part_number', 'part_length', 'part_width',
         'part_height', 'part_gross_weight', 'part_net_weight', 'material_name',
         'material_grade', 'supplier', 'supplier_code', 'equipment_name', 'equipment_model',
@@ -56,6 +57,6 @@ class ProductAdmin(ImportExportModelAdmin):
         'pieces_per_bag', 'transport_type', 'transport_distance', 'transport_fee_per_vehicle',
         'cartons_per_vehicle', 'management_fee_percentage', 'profit_margin_percentage',
     )
-    search_fields = ('purchase_part', 'part_number')
+    search_fields = ('categories','purchase_part', 'part_number')
 
 admin.site.register(Product,ProductAdmin)

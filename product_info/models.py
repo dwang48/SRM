@@ -1,6 +1,7 @@
 from django.db import models
 
 class Product(models.Model):
+    categories = models.CharField(max_length=255,verbose_name='类别')
     purchase_part = models.CharField(max_length=255, verbose_name='采购零件',null=True,blank=True)
     part_number = models.CharField(max_length=255, verbose_name='零件编号',null=True,blank=True)
     part_length = models.FloatField(verbose_name='零件尺寸 长（mm）',null=True,blank=True)
@@ -40,6 +41,6 @@ class Product(models.Model):
         return str(self.purchase_part) if self.purchase_part else ''
 
     class Meta:
-        verbose_name = "垂重产品信息"
-        verbose_name_plural = "垂重产品信息"
+        verbose_name = "产品信息"
+        verbose_name_plural = "产品信息"
 

@@ -9,21 +9,21 @@ from django.http import HttpResponse
 
 class MaterialCost:
     @staticmethod
-    def calculate(product_gross_weight, material_price, product_net_weight, scrap_price):
+    def calculate(产品毛重, 原材料价格, 产品净重, 废料价格):
         """
-        Calculate the material cost based on the provided formula.
+        根据提供的公式计算原材料成本。
 
-        Parameters:
-        - product_gross_weight: 产品毛重
-        - material_price: 原材料价格
-        - product_net_weight: 产品净重
-        - scrap_price: 废料价格
+        参数：
+        - 产品毛重: 商品的总重量
+        - 原材料价格: 原材料的单位价格
+        - 产品净重: 商品的净重量
+        - 废料价格: 废料的单位价格
 
-        Returns:
-        - material_cost: Calculated material cost
+        返回：
+        - 原材料成本: 计算出的原材料成本
         """
-        material_cost = product_gross_weight * (material_price / 1000000) - (product_gross_weight - product_net_weight) * (scrap_price / 1000000)
-        return material_cost
+        原材料成本 = 产品毛重 * (原材料价格 / 1000000) - (产品毛重 - 产品净重) * (废料价格 / 1000000)
+        return 原材料成本
 
 
 
@@ -41,7 +41,7 @@ class ProcessCost:
         b = (设备功率 * 电价) / 真实产能
         c = (操作员工资 / 21.5) * 操作员人数 / 24 / 真实产能
         # print(次数)
-        print(f"Inside method, times: {次数}")
+        #print(f"Inside method, times: {次数}")
         return (a + b + c) * 次数
 
     #有材料消耗类
@@ -53,7 +53,7 @@ class ProcessCost:
         g = (设备功率 * 电价) / 真实产能
         h = (操作员工资 / 21.5) * 操作员人数 / 24 / 真实产能
         # print(次数)
-        print(f"Inside method, times: {次数}")
+        # print(f"Inside method, times: {次数}")
         return (e + f + g + h) * 次数
 
     #表面加工处理

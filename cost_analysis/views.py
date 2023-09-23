@@ -5,12 +5,10 @@ from vendor_info.models import Vendor
 from .utils import *
 from .models import Record
 from django.shortcuts import render
-from django.http import JsonResponse
 from django.core.exceptions import ImproperlyConfigured
 from django.apps import apps
-from django.contrib import messages
-from django.http import HttpResponseRedirect,HttpResponse
-
+from django.contrib.auth.decorators import user_passes_test
+from django.http import HttpResponseForbidden
 
 
 
@@ -22,12 +20,13 @@ def calculate_processing_cost(request):
     vendor = Vendor.objects.get(supplier_name=product.supplier)
 
     method_mapping = {
-        #垂重
+        # 垂重
         '剪切': ProcessCost.无材料消耗类成本,
         '冲压': ProcessCost.有材料消耗类成本,
         '冷镦': ProcessCost.有材料消耗类成本,
+        '切削': ProcessCost.无材料消耗类成本,
         '表面加工处理': ProcessCost.surface_cost,
-        #磁铁
+        # 磁铁
         '真空感应速凝炉': ProcessCost.无材料消耗类成本,
         '气流磨':ProcessCost.无材料消耗类成本,
         '磁场成型压机':ProcessCost.无材料消耗类成本,
@@ -38,10 +37,76 @@ def calculate_processing_cost(request):
         '震动抛光盘':ProcessCost.无材料消耗类成本,
         '电镀槽': ProcessCost.无材料消耗类成本,
         '充磁机': ProcessCost.无材料消耗类成本,
-        #弹簧
+        # 弹簧
         '卷簧机': ProcessCost.无材料消耗类成本,
         '回火炉': ProcessCost.无材料消耗类成本,
+        # 塑料成品
 
+        # 注塑
+
+        # 喷涂
+
+        # 电镀
+
+        # 烫金
+
+        # 印刷
+
+        # 喷绘
+
+        # 组装
+
+        # 冲压
+
+        # 抛光
+
+        # 氧化
+
+        # 酸洗
+
+        # 刻字
+
+        # 磁铁
+
+        # 垂重
+
+        # 弹簧
+
+        # 铝件成品
+
+        # 栈板
+
+        # 纸箱
+
+        # 包装袋
+
+        # 彩盒
+
+        # 吸塑盘
+        
+        # 转印纸
+        
+        # 垫片
+        
+        # 箔纸
+        
+        # 标签
+        
+        # 收缩膜
+        
+        # 模架
+        
+        # 模芯
+        
+        # 玻璃管
+        
+        # 棉头
+        
+        # 镜片
+        
+        # 胶头
+        
+        # 刷毛
     }
 
     total_cost = 0  # 初始化总成本为0
@@ -54,9 +119,15 @@ def calculate_processing_cost(request):
         hourly_capacity_key = f"hourly_capacity_{manufacturing_process}|{equipment_name}|{equipment_model}"
         qualified_rate_key = f"qualification_rate_{manufacturing_process}|{equipment_name}|{equipment_model}"
         times_key = f"times_{manufacturing_process}|{equipment_name}|{equipment_model}"
+        operator_count_key = f"operator_count_{manufacturing_process}|{equipment_name}|{equipment_model}"
+        operator_wages_key = f"operator_wages_{manufacturing_process}|{equipment_name}|{equipment_model}"
+        
+        
         hourly_capacity = request.POST.get(hourly_capacity_key, None)
         qualified_rate = request.POST.get(qualified_rate_key, None)
         times = request.POST.get(times_key, None)
+        operator_count = request.POST.get(operator_count_key, None)
+        operator_wages = request.POST.get(operator_wages_key, None)
 
         hourly_capacity = float(hourly_capacity)
         qualified_rate = float(qualified_rate)
@@ -64,14 +135,38 @@ def calculate_processing_cost(request):
             times = 1
         else:
             times = int(times)
-        print(f"Received times: {times}")
+
+        if operator_count == '':
+            operator_count = 0
+        else:
+            operator_count = int(operator_count)
+
+        if operator_wages == '':
+            operator_wages = 0
+        else:
+            operator_wages = int(operator_wages)
+
+
         equipment = Equipment.objects.get(
             manufacturing_process=manufacturing_process,
             equipment_name=equipment_name,
             equipment_model=equipment_model
         )
 
+
         method_params = {
+            '切削': {
+                '设备现价值': equipment.current_value,
+                '剩余折旧年数': equipment.remaining_depreciation_years,
+                '每小时产能': hourly_capacity,
+                '设备功率': equipment.power_kw,
+                '电价': vendor.electricity_price,
+                '操作员工资': operator_wages if operator_wages else vendor.operator_wages,
+                '操作员人数': operator_count if operator_count else product.operator_count,
+                '合格率': qualified_rate,
+                '次数': times,
+            },
+
             '冷镦':{
                 '设备现价值': equipment.current_value,
                 '剩余折旧年数': equipment.remaining_depreciation_years,
@@ -80,8 +175,8 @@ def calculate_processing_cost(request):
                 '单价': equipment.oil_price_per_kg,
                 '设备功率': equipment.power_kw,
                 '电价': vendor.electricity_price,
-                '操作员工资': vendor.operator_wages,
-                '操作员人数': product.operator_count,
+                '操作员工资': operator_wages if operator_wages else vendor.operator_wages,
+                '操作员人数': operator_count if operator_count else product.operator_count,
                 '合格率': qualified_rate,
                 '次数': times,
             },
@@ -91,8 +186,8 @@ def calculate_processing_cost(request):
                 '每小时产能': hourly_capacity,
                 '设备功率': equipment.power_kw,
                 '电价': vendor.electricity_price,
-                '操作员工资': vendor.operator_wages,
-                '操作员人数': product.operator_count,
+                '操作员工资': operator_wages if operator_wages else vendor.operator_wages,
+                '操作员人数': operator_count if operator_count else product.operator_count,
                 '合格率': qualified_rate,
                 '次数': times,
             },
@@ -104,8 +199,8 @@ def calculate_processing_cost(request):
                 '单价': equipment.oil_price_per_kg,
                 '设备功率': equipment.power_kw,
                 '电价': vendor.electricity_price,
-                '操作员工资': vendor.operator_wages,
-                '操作员人数': product.operator_count,
+                '操作员工资': operator_wages if operator_wages else vendor.operator_wages,
+                '操作员人数': operator_count if operator_count else product.operator_count,
                 '合格率': qualified_rate,
                 '次数': times,
             },
@@ -125,7 +220,13 @@ def calculate_processing_cost(request):
     return total_cost
 
 
+def is_admin(user):
+    return user.is_authenticated and user.is_staff
+
+# @user_passes_test(is_admin)
 def calculate_cost(request):
+    if not is_admin(request.user):
+        return HttpResponseForbidden()
     category = request.path_info.split('/')[2]
     selected_equipment_data_list = request.POST.getlist('selected_equipment')
 
@@ -147,6 +248,8 @@ def calculate_cost(request):
     shipping_result = 0
     processing_result = 0
     packaging_result = 0
+    managing_result = 0
+    profit = 0
     total_cost = 0
     # selected_methods = []
     management_fee_percentage = 0
@@ -199,30 +302,50 @@ def calculate_cost(request):
 
         # 计算材料费
         material_result = MaterialCost.calculate(product_gross_weight,material_info.price,product_net_weight,material_info.scrap_price)
+        material_result = round(material_result,4)
         # material_result_rounded = round(material_result,3)
 
         #计算包装费
         packaging_result = PackagingCost.calculate(product_info.carton_price,product_info.pieces_per_carton,product_info.pe_bag_price,product_info.pieces_per_bag)
+        packaging_result = round(packaging_result,4)
         # packaging_result_rounded = round(packaging_result,3)
 
         #计算运输费
         shipping_result = ShippingCost.calculate(product_info.transport_fee_per_vehicle,product_info.cartons_per_vehicle,product_info.pieces_per_carton)
+        shipping_result = round(shipping_result,4)
 
         #计算加工费
         processing_result = calculate_processing_cost(request)
         # material_result_rounded = round(material_result,3)
+        processing_result = round(processing_result,4)
 
         #显示加工费明细
         processing_details += ", ".join(selected_equipment_data_list)
 
+        subtotal = material_result + packaging_result + shipping_result + processing_result
+        # print("小记：" + str(subtotal))
+        #计算管理费
+        management_fee_percentage = product_info.management_fee_percentage / 100
+        managing_result = management_fee_percentage * subtotal
+        managing_result = round(managing_result,4)
+
+        #计算利润
+        profit_margin_percentage = product_info.profit_margin_percentage/100
+        # print(profit_margin_percentage)
+        profit = profit_margin_percentage * (1 + management_fee_percentage)*subtotal
+        profit = round(profit,4)
+
+
 
         #计算总费用
-        total_cost = (material_result + packaging_result + shipping_result + processing_result)*(1+management_fee_percentage/100)*(1+profit_margin_percentage/100)*1.13
-
-
+        total_cost = (material_result + packaging_result + shipping_result + processing_result)*(1+management_fee_percentage)*(1+profit_margin_percentage)*1.13
+        total_cost = round(total_cost,4)
 
         #保存到计算record中的数据库中
         # 创建新的记录实例
+        # save_flag = request.POST.get('saveFlag','false')
+        # print(f"Save flag: {save_flag}")
+        # if save_flag == 'true':
         new_record = Record(
         产品编号=product_info.part_number,  # 假设你已经提取了product_info
         材料费=material_result,  # 你之前计算的值
@@ -232,7 +355,7 @@ def calculate_cost(request):
         包装费=packaging_result,
         管理费比例=management_fee_percentage,
         利润率=profit_margin_percentage,
-        总成本=total_cost  # 你之前计算的值
+        总成本=total_cost 
         )
         new_record.save()
 
@@ -245,7 +368,8 @@ def calculate_cost(request):
         'packaging_result': packaging_result,
         'processing_result': processing_result,
         'total_cost': total_cost,
+        'managing_result':managing_result,
+        'profit':profit,
         # 'selected_methods':selected_methods,
     })
-
 

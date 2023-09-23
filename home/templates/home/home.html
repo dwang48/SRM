@@ -6,7 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>主页</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> -->
+    <link href="{% static 'bootstrap.min.css' %}", rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -35,7 +36,7 @@
         }
         body {
             /* background: linear-gradient(to bottom, #ffffff, #f1f1f1); */
-            background: radial-gradient(circle, #000000, #ffffff)
+            background: radial-gradient(circle, #000000, #797878)
         }
         .display-4 {
             color: #fff;
@@ -70,11 +71,11 @@
         <a class="navbar-brand" href="/">
             <img src="{% static 'logo.jpeg' %}" alt="Logo" style="width: 60px; height: 60px; margin-right: 10px;">
             洽兴成本报价</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <a href="/admin/" class="nav-link fa-solid fa-user">管理员</a>
                 </li>
@@ -97,7 +98,7 @@
                 </select>
             </div>
             <div class="text-center">
-                <button id="confirmBtn" class="btn btn-gradient">确认</button>
+                <button id="confirmBtn" class="btn btn-gradient mt-3">确认</button>
             </div>
         </div>
     </div>
@@ -170,7 +171,8 @@
         });
       </script>
     <!-- Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+    <script src='{%static "bootstrap.min.js" %}'></script>
     <footer class="mt-5">
         <div class="text-center">
             <p>&copy; Etale.ai. All rights reserved.</p>

@@ -24,6 +24,8 @@ urlpatterns = [
     path('',include('home.urls'))
 ]
 
+
+admin.site.base_template = 'myproject/custom_admin_base.html'
 admin.site.site_header = "洽兴报价管理系统"
 admin.site.site_title = "洽兴报价管理系统"
 admin.site.index_title = "欢迎使用洽兴报价管理系统"

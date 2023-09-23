@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-*z66lo9z5mz&st(&!7vzdrmyndnw%6ucep)--nl!cjs-r$m#b5"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -38,21 +38,26 @@ STATICFILES_DIRS = [
 # Application definition
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = '/static/'
-SIMPLEUI = {
-    'logo': '/static/images/shyahsin.jpeg',
-    # ... other configurations ...
-}
+
 # 指定simpleui默认的主题,指定一个文件名，相对路径就从simpleui的theme目录读取
 # SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'
 
 # SIMPLEUI_LOGO = 'images/logo.jpeg'
 SIMPLEUI_HOME_INFO=False
 SIMPLEUI_ANALYSIS = False
+SIMPLEUI_LOGO = '/static/images/shyahsin.jpeg'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['cold-bugs-thank.loca.lt', 'localhost', '127.0.0.1','c39a-106-11-200-10.ngrok-free.app']
+
+CSRF_TRUSTED_ORIGINS = ['https://cold-bugs-thank.loca.lt','https://c39a-106-11-200-10.ngrok-free.app']
 
 SIMPLEUI_DEFAULT_ICON = True
-SIMPLEUI_HOME_QUICK=False
+SIMPLEUI_HOME_QUICK=True
+
+SIMPLEUI_STATIC_OFFLINE = True
+
+SIMPLEUI_INDEX = '/'
+
 
 
 INSTALLED_APPS = [
@@ -102,6 +107,8 @@ TEMPLATES = [
     },
 ]
 
+ADMIN_BASE_TEMPLATE = './custom_admin_base.html'
+
 WSGI_APPLICATION = "myproject.wsgi.application"
 
 
@@ -150,7 +157,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
+# STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

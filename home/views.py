@@ -1,8 +1,15 @@
 from django.shortcuts import render
+# from django.contrib.auth.decorators import user_passes_test
 
 # def home(request):
 #     return render(request, 'home/home.html')
 
+# def is_admin(user):
+#     return user.is_authenticated and user.is_staff
+
+
+
+# @user_passes_test(is_admin)
 def choose_category(request):
    category_choices = [('塑料成品', '塑料成品'),
  ('注塑', '注塑'),
