@@ -263,23 +263,23 @@ canvas {
                 inputGroup.innerHTML = `
                     <div class="col-sm-4">
                         <label>${label} 合格率:</label>
-                        <input type="number" class="form-control" name="qualification_rate_${equipmentValue}" placeholder="合格率(%)">
+                        <input type="number" min = "1" max = "100" class="form-control" name="qualification_rate_${equipmentValue}" placeholder="合格率(%)">
                     </div>
                     <div class="col-sm-4">
                         <label>每小时产能:</label>
-                        <input type="number" class="form-control" name="hourly_capacity_${equipmentValue}" placeholder="每小时产能(个)">
+                        <input type="number" min = "1" class="form-control" name="hourly_capacity_${equipmentValue}" placeholder="每小时产能(个)">
                     </div>
                     <div class="col-sm-4">
                         <label>工艺次数:</label>
-                        <input type="number" class="form-control" name="times_${equipmentValue}" placeholder="1">
+                        <input type="number" min = "1" class="form-control" name="times_${equipmentValue}" placeholder="1">
                     </div>
                     <div class="col-sm-4">
                         <label>操作员人数:</label>
-                        <input type="number" class="form-control" name="operator_count_${equipmentValue}" placeholder="默认产品信息的人数">
+                        <input type="number" min = "0" class="form-control" name="operator_count_${equipmentValue}" placeholder="默认产品信息的人数">
                     </div>
                     <div class="col-sm-4">
                         <label>操作员工资:</label>
-                        <input type="number" class="form-control" name="operator_wages_${equipmentValue}" placeholder="默认供应商信息的工资">
+                        <input type="number" min = "0" class="form-control" name="operator_wages_${equipmentValue}" placeholder="默认供应商信息的工资">
                     </div>
                     `;
                     // <div class="col-sm-4 text-right">
@@ -287,6 +287,28 @@ canvas {
                     // </div>
 
                 inputContainer.appendChild(inputGroup);
+                const qualificationRateInput = inputGroup.querySelector(`input[name="qualification_rate_${equipmentValue}"]`);
+                const hourlyCapacityInput = inputGroup.querySelector(`input[name="hourly_capacity_${equipmentValue}"]`);
+                const timesInput = inputGroup.querySelector(`input[name="times_${equipmentValue}"]`);
+                const operatorCountInput = inputGroup.querySelector(`input[name="operator_count_${equipmentValue}"]`);
+                const operatorWagesInput = inputGroup.querySelector(`input[name="operator_wages_${equipmentValue}"]`);
+                
+                [qualificationRateInput, hourlyCapacityInput, timesInput, operatorCountInput, operatorWagesInput].forEach(input => {
+                    input.addEventListener('input', function() {
+                        let value = parseFloat(this.value);
+                        if (this.name.startsWith('qualification_rate_')) {
+                            if (value < 0 || value > 100) {
+                                alert('合格率应在 0-100 之间');
+                                this.value = '';
+                            }
+                        } else {
+                            if (value < 0) {
+                                alert('数值应为正数');
+                                this.value = '';
+                            }
+                        }
+                    });
+                });
             });
         }
 
