@@ -222,7 +222,7 @@ canvas {
             $('select').select2(); // 初始化所有的下拉菜单
 });
 </script>
-<script>
+<!-- <script>
     document.addEventListener("DOMContentLoaded", function () {
         const selectElement = document.getElementById("select2-equipment");
         const inputContainer = document.getElementById("input-container");
@@ -331,9 +331,59 @@ canvas {
         }
     }
 });
+</script> -->
+<script>
+$(document).ready(function() {
+    const selectElement = $('#select2-equipment');
+    const inputContainer = $("#input-container");
 
+    // Initialize Select2
+    selectElement.select2();
 
-    </script>
+    // Event listener for Select2 change
+    selectElement.on('change', function() {
+        const selectedOptions = $(this).val() || [];
+        updateDynamicFields(selectedOptions);
+    });
+
+    function updateDynamicFields(selectedOptions) {
+        // Clear existing fields
+        inputContainer.empty();
+
+        // Create new fields based on selected options
+        selectedOptions.forEach(optionValue => {
+            const label = $(`option[value="${optionValue}"]`).text();
+            const inputGroup = $(`
+                <div class="input-group mb-3" id="group_${optionValue}">
+                    <div class="col-sm-4">
+                        <label>${label} 合格率:</label>
+                        <input type="number" min = "1" max = "100" class="form-control" name="qualification_rate_${optionValue}" placeholder="合格率(%)">
+                    </div>
+                    <div class="col-sm-4">
+                        <label>每小时产能:</label>
+                        <input type="number" min = "1" class="form-control" name="hourly_capacity_${optionValue}" placeholder="每小时产能(个)">
+                    </div>
+                    <div class="col-sm-4">
+                        <label>工艺次数:</label>
+                        <input type="number" min = "1" class="form-control" name="times_${optionValue}" placeholder="1">
+                    </div>
+                    <div class="col-sm-4">
+                        <label>操作员人数:</label>
+                        <input type="number" min = "0" class="form-control" name="operator_count_${optionValue}" placeholder="默认产品信息的人数">
+                    </div>
+                    <div class="col-sm-4">
+                        <label>操作员工资:</label>
+                        <input type="number" min = "0" class="form-control" name="operator_wages_${optionValue}" placeholder="默认供应商信息的工资">
+                    </div>
+
+                </div>
+            `);
+            inputContainer.append(inputGroup);
+        });
+    }
+});
+
+</script>
 
 <script>
 

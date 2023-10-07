@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-*z66lo9z5mz&st(&!7vzdrmyndnw%6ucep)--nl!cjs-r$m#b5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
@@ -47,7 +47,8 @@ SIMPLEUI_HOME_INFO=False
 SIMPLEUI_ANALYSIS = False
 SIMPLEUI_LOGO = '/static/images/shyahsin.jpeg'
 
-ALLOWED_HOSTS = ['cold-bugs-thank.loca.lt', 'localhost', '127.0.0.1','c39a-106-11-200-10.ngrok-free.app']
+# ALLOWED_HOSTS = ['cold-bugs-thank.loca.lt', 'localhost', '127.0.0.1','c39a-106-11-200-10.ngrok-free.app']
+ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = ['https://cold-bugs-thank.loca.lt','https://c39a-106-11-200-10.ngrok-free.app']
 

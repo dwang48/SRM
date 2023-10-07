@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from cost_analysis import views
 
 urlpatterns = [
     path('suliao/', views.calculate_cost, name='calculate_suliao'),

@@ -216,7 +216,7 @@ def calculate_processing_cost(request):
             total_cost += cost
             print("当前选项的成本: " + str(cost))
 
-    print("总成本: " + str(total_cost))
+    # print("总成本: " + str(total_cost))
     return total_cost
 
 
@@ -227,11 +227,12 @@ def is_admin(user):
 def calculate_cost(request):
     if not is_admin(request.user):
         return HttpResponseForbidden()
-    category = request.path_info.split('/')[2]
     selected_equipment_data_list = request.POST.getlist('selected_equipment')
-
+    category = request.path_info.split('/')[2]
+    
     # 将首字母大写并拼接到 'MaterialPrice'
-    model_name = f"{category.capitalize()}MaterialPrice"
+    # model_name = f"{category.capitalize()}MaterialPrice"
+    model_name = f"ChuizhongMaterialPrice"
     print(model_name)
 
     # 动态获取模型
@@ -239,6 +240,9 @@ def calculate_cost(request):
         ModelClass = apps.get_model('material_price_info', model_name)
     except LookupError:
         raise ImproperlyConfigured(f"No model found for category: {category}")
+    
+
+    # ModelClass = 
 
     # materials = ModelClass.objects.all()
     
@@ -287,9 +291,9 @@ def calculate_cost(request):
     if request.method == "POST":
         selected_product_id = request.POST.get('selected_product')
         product_info = Product.objects.get(id=selected_product_id)
-        vendor_info = Vendor.objects.get(supplier_name=product_info.supplier)
+        # vendor_info = Vendor.objects.get(supplier_name=product_info.supplier)
         material_info = ModelClass.objects.get(material_name=product_info.material_name,material_grade = product_info.material_grade)
-
+        
         # selected_material = request.POST.get('selected_material')
 
         product_gross_weight = product_info.part_gross_weight

@@ -161,8 +161,9 @@
           const selectedValue = document.getElementById("categorySelect").value;
           const url = urlMappings[selectedValue];
           if (url) {
-              window.location.href = `${url}?name=${encodeURIComponent(selectedValue)}`;
-          }
+            //   window.location.href = `${url}?name=${encodeURIComponent(selectedValue)}`;
+            window.open(`${url}?name=${encodeURIComponent(selectedValue)}`, '_blank');
+        }
       });
       document.addEventListener('DOMContentLoaded', function() {
             particlesJS.load('particles-js', '{% static "js/particles.json" %}', function() {
