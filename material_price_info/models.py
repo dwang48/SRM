@@ -18,7 +18,7 @@ class BaseMaterialPrice(models.Model):
         return self.material_name
     
 # 垂重
-class ChuizhongMaterialPrice(BaseMaterialPrice):
+class MaterialPrice(BaseMaterialPrice):
     class Meta(BaseMaterialPrice.Meta):
         verbose_name = "材料价格"
         verbose_name_plural = "材料价格"

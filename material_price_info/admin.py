@@ -28,10 +28,10 @@ class BaseMaterialPriceAdmin(ImportExportModelAdmin):
     search_fields = ['supplier_name', 'material_name']
 
 
-class ChuizhongMaterialPriceResource(BaseMaterialPriceResource):
+class MaterialPriceResource(BaseMaterialPriceResource):
     class Meta(BaseMaterialPriceResource.Meta):
-        model = ChuizhongMaterialPrice
+        model = MaterialPrice
 
-@admin.register(ChuizhongMaterialPrice)
-class ChuizhongMaterialPriceAdmin(BaseMaterialPriceAdmin):
-    resource_class = ChuizhongMaterialPriceResource
+@admin.register(MaterialPrice)
+class MaterialPriceAdmin(BaseMaterialPriceAdmin):
+    resource_class = MaterialPriceResource

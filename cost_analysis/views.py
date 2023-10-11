@@ -230,9 +230,10 @@ def calculate_cost(request):
     selected_equipment_data_list = request.POST.getlist('selected_equipment')
     category = request.path_info.split('/')[2]
     
-    # 将首字母大写并拼接到 'MaterialPrice'
-    # model_name = f"{category.capitalize()}MaterialPrice"
-    model_name = f"ChuizhongMaterialPrice"
+    category_name = request.GET.get('name')
+    print(category_name)
+
+    model_name = f"MaterialPrice"
     print(model_name)
 
     # 动态获取模型
@@ -259,9 +260,9 @@ def calculate_cost(request):
     management_fee_percentage = 0
     profit_margin_percentage = 0
     
-    products = Product.objects.all()
-    Equipments = Equipment.objects.all()
-    manufacturing_process = Equipment.objects.values_list('manufacturing_process',flat=True).distinct()
+    products = Product.objects.filter(categories=category_name)
+    # Equipments = Equipment.objects.all()
+    manufacturing_process = Equipment.objects.filter(purchase_category=category_name).values_list('manufacturing_process',flat=True).distinct()
 
     manufacturing_data = []
 

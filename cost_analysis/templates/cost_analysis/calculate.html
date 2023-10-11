@@ -194,8 +194,8 @@ canvas {
                 {% endif %}
             </div>
 
-            <div class="col-md-6">
-                <canvas id="costChart" width="400" height="400"></canvas>
+            <div class="col-md-6 ">
+                <canvas id="costChart" width="500" height="500"></canvas>
             </div>
         </div>
     </div>
@@ -222,116 +222,7 @@ canvas {
             $('select').select2(); // 初始化所有的下拉菜单
 });
 </script>
-<!-- <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const selectElement = document.getElementById("select2-equipment");
-        const inputContainer = document.getElementById("input-container");
 
-        const addButton = document.createElement('button');
-        addButton.innerHTML = '<i class="fas fa-check"></i>';  // 使用Font Awesome图标
-        addButton.className = 'btn btn-primary mt-3'; // Bootstrap样式
-        addButton.type = 'button';
-        // addButton.style.marginBottom= '10px';
-        addButton.style.margin = '0 10px 10px 0';
-        addButton.addEventListener('click', function() {
-            addSelectedEquipments();
-        });
-        
-
-        const removeButton = document.createElement('button');
-        removeButton.innerHTML = '<i class="fas fa-trash"></i>'; // 使用Font Awesome图标
-        removeButton.className = 'btn btn-danger mt-3'; // Bootstrap样式
-        removeButton.type = 'button';
-        removeButton.style.marginBottom= '10px';
-        removeButton.addEventListener('click', function() {
-            removeSelectedEquipments();
-        });
-
-        inputContainer.appendChild(addButton);
-        inputContainer.appendChild(removeButton);
-
-        function addSelectedEquipments() {
-            const selectedOptions = Array.from(selectElement.selectedOptions);
-            
-            selectedOptions.forEach(option => {
-                const equipmentValue = option.value;
-                const label = option.textContent;
-                const inputGroup = document.createElement("div");
-                inputGroup.classList.add("input-group", "mb-3");
-                inputGroup.id = `group_${equipmentValue}`;
-                
-                inputGroup.innerHTML = `
-                    <div class="col-sm-4">
-                        <label>${label} 合格率:</label>
-                        <input type="number" min = "1" max = "100" class="form-control" name="qualification_rate_${equipmentValue}" placeholder="合格率(%)">
-                    </div>
-                    <div class="col-sm-4">
-                        <label>每小时产能:</label>
-                        <input type="number" min = "1" class="form-control" name="hourly_capacity_${equipmentValue}" placeholder="每小时产能(个)">
-                    </div>
-                    <div class="col-sm-4">
-                        <label>工艺次数:</label>
-                        <input type="number" min = "1" class="form-control" name="times_${equipmentValue}" placeholder="1">
-                    </div>
-                    <div class="col-sm-4">
-                        <label>操作员人数:</label>
-                        <input type="number" min = "0" class="form-control" name="operator_count_${equipmentValue}" placeholder="默认产品信息的人数">
-                    </div>
-                    <div class="col-sm-4">
-                        <label>操作员工资:</label>
-                        <input type="number" min = "0" class="form-control" name="operator_wages_${equipmentValue}" placeholder="默认供应商信息的工资">
-                    </div>
-                    `;
-                    // <div class="col-sm-4 text-right">
-                    //     <button type="button" class="btn btn-danger mt-4" onclick="removeGroup('group_${equipmentValue}')">移除</button>
-                    // </div>
-
-                inputContainer.appendChild(inputGroup);
-                const qualificationRateInput = inputGroup.querySelector(`input[name="qualification_rate_${equipmentValue}"]`);
-                const hourlyCapacityInput = inputGroup.querySelector(`input[name="hourly_capacity_${equipmentValue}"]`);
-                const timesInput = inputGroup.querySelector(`input[name="times_${equipmentValue}"]`);
-                const operatorCountInput = inputGroup.querySelector(`input[name="operator_count_${equipmentValue}"]`);
-                const operatorWagesInput = inputGroup.querySelector(`input[name="operator_wages_${equipmentValue}"]`);
-                
-                [qualificationRateInput, hourlyCapacityInput, timesInput, operatorCountInput, operatorWagesInput].forEach(input => {
-                    input.addEventListener('input', function() {
-                        let value = parseFloat(this.value);
-                        if (this.name.startsWith('qualification_rate_')) {
-                            if (value < 0 || value > 100) {
-                                alert('合格率应在 0-100 之间');
-                                this.value = '';
-                            }
-                        } else {
-                            if (value < 0) {
-                                alert('数值应为正数');
-                                this.value = '';
-                            }
-                        }
-                    });
-                });
-            });
-        }
-
-    function removeSelectedEquipments() {
-        const selectedOptions = Array.from(selectElement.selectedOptions);
-        
-        selectedOptions.forEach(option => {
-            const equipmentValue = option.value;
-            const inputGroup = document.getElementById(`group_${equipmentValue}`);
-            if (inputGroup) {
-                inputGroup.remove();
-            }
-        });
-    }
-
-    window.removeGroup = function(groupID) {
-        const inputGroup = document.getElementById(groupID);
-        if (inputGroup) {
-            inputGroup.remove();
-        }
-    }
-});
-</script> -->
 <script>
 $(document).ready(function() {
     const selectElement = $('#select2-equipment');
@@ -491,6 +382,8 @@ document.addEventListener("DOMContentLoaded", function () {
       data: data
     });
   </script>
+
+
 
 <footer class="mt-5">
     <div class="text-center">

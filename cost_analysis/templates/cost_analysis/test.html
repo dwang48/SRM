@@ -1,29 +1,77 @@
-{%load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Particles.js Test</title>
-    <script src="{% static 'js/particles.js' %}"></script>
-    <style>
-        #particles-js {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- 引入Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
-    <div id="particles-js"></div>
+<!-- 顶部导航栏 -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">ChatGPT</a>
+    <!-- ... 其他链接 ... -->
+    <!-- 语言选择器 和 个人信息区 -->
+</nav>
 
-    <script>
-        particlesJS.load('particles-js', '{% static "js/particlesjs-config.json" %}', function() {
-            console.log('particles.js loaded - callback');
-        });
-    </script>
+<div class="container-fluid">
+    <div class="row">
+        <!-- 侧边导航栏 -->
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <div class="position-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <span data-feather="home"></span>
+                            仪表盘 <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="#">日历</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">聊天</a></li>
+                    <!-- ... 其他链接 ... -->
+                </ul>
+            </div>
+        </nav>
 
+        <!-- 仪表盘主区 -->
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+            <!-- 概览卡片 -->
+            <div class="row">
+                <div class="col-3">
+                    <div class="card">
+                        <!-- 客户数量 -->
+                    </div>
+                </div>
+                <!-- ... 其他卡片 ... -->
+            </div>
+
+            <!-- 总销售额显示 -->
+            <div class="my-4">
+                <!-- 半圆形图展示代码 -->
+            </div>
+
+            <!-- 收入展示 -->
+            <div class="my-4">
+                <!-- 收入对比图代码 -->
+            </div>
+
+            <!-- 收入按地点 -->
+            <div class="my-4">
+                <!-- 柱状图代码 -->
+            </div>
+
+            <!-- 热销商品列表 -->
+            <div class="my-4">
+                <!-- 列表代码 -->
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- 引入Bootstrap JS 和 jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
