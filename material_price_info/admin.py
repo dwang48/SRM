@@ -2,6 +2,33 @@ from django.contrib import admin
 from import_export import resources,fields
 from import_export.admin import ImportExportModelAdmin
 from .models import *
+from django.http import HttpResponse
+
+
+import openpyxl
+
+def export_to_excel(modeladmin, request, queryset):
+    model = modeladmin.model
+    model_name = model._meta.verbose_name_plural
+    
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{model_name}.xlsx"'
+    
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    field_names = [field.verbose_name for field in model._meta.fields]
+    ws.append(field_names)  # Write header
+    
+    for obj in queryset:
+        row = [getattr(obj, field.name) for field in model._meta.fields]
+        ws.append(row)  # Write data rows
+    
+    wb.save(response)
+    return response
+
+
+export_to_excel.short_description = '导出Excel'
+
 
 # 公共 Resource 类
 class BaseMaterialPriceResource(resources.ModelResource):
@@ -16,6 +43,7 @@ class BaseMaterialPriceResource(resources.ModelResource):
     price_update_date = fields.Field(attribute='price_update_date', column_name='价格更新日期')
     
     class Meta:
+        exclude = ('id',)
         abstract = True
         skip_unchanged = True
         report_skipped = True
@@ -34,4 +62,5 @@ class MaterialPriceResource(BaseMaterialPriceResource):
 
 @admin.register(MaterialPrice)
 class MaterialPriceAdmin(BaseMaterialPriceAdmin):
+    actions=[export_to_excel]
     resource_class = MaterialPriceResource

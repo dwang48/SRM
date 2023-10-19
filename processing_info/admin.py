@@ -16,6 +16,7 @@ class ProcessingProceduresResource(resources.ModelResource):
     operator_count = fields.Field(attribute='operator_count', column_name='操作工人数')
     class Meta:
         model = ProcessingProcedures
+        exclude = ('id',)
         # 设置搜索字段为设备名称和设备型号
         
 

@@ -2,6 +2,30 @@ from import_export import resources,fields
 from import_export.admin import ImportExportModelAdmin
 from .models import Product
 from django.contrib import admin
+from django.http import HttpResponse
+import openpyxl
+
+def export_to_excel(modeladmin, request, queryset):
+    model = modeladmin.model
+    model_name = model._meta.verbose_name_plural
+    
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{model_name}.xlsx"'
+    
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    field_names = [field.verbose_name for field in model._meta.fields]
+    ws.append(field_names)  # Write header
+    
+    for obj in queryset:
+        row = [getattr(obj, field.name) for field in model._meta.fields]
+        ws.append(row)  # Write data rows
+    
+    wb.save(response)
+    return response
+
+
+export_to_excel.short_description = '导出Excel'
 
 class ProductResource(resources.ModelResource):
     categories = fields.Field(attribute='categories', column_name="类别")
@@ -34,7 +58,7 @@ class ProductResource(resources.ModelResource):
     transport_type = fields.Field(attribute='transport_type', column_name="运输车型")
     transport_distance = fields.Field(attribute='transport_distance', column_name="运输距离\n（公里）")
     transport_fee_per_vehicle = fields.Field(attribute='transport_fee_per_vehicle', column_name="每车运费")
-    cartons_per_vehicle = fields.Field(attribute='cartons_per_vehicle', column_name="每车箱数")
+    cartons_per_vehicle = fields.Field(attribute='cartons_per_vehicle', column_name="每车包装量")
     management_fee_percentage = fields.Field(attribute='management_fee_percentage', column_name="管理费用\n(%)")
     profit_margin_percentage = fields.Field(attribute='profit_margin_percentage', column_name="利润率\n(%)")
 
@@ -42,10 +66,12 @@ class ProductResource(resources.ModelResource):
         model = Product
         # skip_unchanged = True
         # report_skipped = True
+        exclude = ('id',)
         import_id_fields = ('part_number',)
 
 # @admin.register(Product)
 class ProductAdmin(ImportExportModelAdmin):
+    actions = [export_to_excel]
     resource_class = ProductResource
     list_display = ('categories',
         'purchase_part', 'part_number', 'part_length', 'part_width',

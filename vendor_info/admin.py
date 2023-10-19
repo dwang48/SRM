@@ -2,6 +2,31 @@ from django.contrib import admin
 from import_export import resources,fields
 from import_export.admin import ImportExportModelAdmin
 from .models import Vendor
+from django.http import HttpResponse
+
+import openpyxl
+
+def export_to_excel(modeladmin, request, queryset):
+    model = modeladmin.model
+    model_name = model._meta.verbose_name_plural
+    
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{model_name}.xlsx"'
+    
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    field_names = [field.verbose_name for field in model._meta.fields]
+    ws.append(field_names)  # Write header
+    
+    for obj in queryset:
+        row = [getattr(obj, field.name) for field in model._meta.fields]
+        ws.append(row)  # Write data rows
+    
+    wb.save(response)
+    return response
+
+
+export_to_excel.short_description = '导出Excel'
 
 class VendorResource(resources.ModelResource):
     categories = fields.Field(attribute='categories', column_name='类别')
@@ -20,9 +45,11 @@ class VendorResource(resources.ModelResource):
         skip_unchanged = True
         report_skipped = True
         import_id_fields = ["supplier_name",]
+        exclude = ['id',]
 
 @admin.register(Vendor)
 class VendorAdmin(ImportExportModelAdmin):
+    actions=[export_to_excel]
     resource_class = VendorResource
     search_fields = ['categories','supplier_name','supplier_code']
     list_display = ['categories','supplier_name', 'supplier_code', 'production_location', 'currency_name', 'operator_wages', 'electricity_price', 'water_price', 'gas_price','update_date']

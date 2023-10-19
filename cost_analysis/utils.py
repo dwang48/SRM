@@ -9,7 +9,7 @@ from django.http import HttpResponse
 
 class MaterialCost:
     @staticmethod
-    def calculate(产品毛重, 原材料价格, 产品净重, 废料价格):
+    def calculate(产品毛重, 原材料价格, 产品净重, 废料价格,系数):
         """
         根据提供的公式计算原材料成本。
 
@@ -22,8 +22,9 @@ class MaterialCost:
         返回：
         - 原材料成本: 计算出的原材料成本
         """
+        #原材料合格率
         原材料成本 = 产品毛重 * (原材料价格 / 1000000) - (产品毛重 - 产品净重) * (废料价格 / 1000000)
-        return 原材料成本
+        return 原材料成本 * 系数
 
 
 
@@ -35,7 +36,7 @@ class ProcessCost:
     #垂重
     #无材料消耗类，仅考虑电费
     @staticmethod
-    def 无材料消耗类成本(设备现价值, 剩余折旧年数, 每小时产能, 设备功率, 电价, 操作员工资, 操作员人数,合格率,次数):
+    def calculate(设备现价值, 剩余折旧年数, 每小时产能, 设备功率, 电价, 操作员工资, 操作员人数,合格率,次数):
         真实产能 = 每小时产能 * 合格率 / 100
         a = (设备现价值 / 剩余折旧年数) / 365 / 24 / 真实产能
         b = (设备功率 * 电价) / 真实产能
@@ -54,12 +55,14 @@ class ProcessCost:
         h = (操作员工资 / 21.5) * 操作员人数 / 24 / 真实产能
         # print(次数)
         # print(f"Inside method, times: {次数}")
+
         return (e + f + g + h) * 次数
 
     #表面加工处理
     @staticmethod
     def surface_cost(单价每公斤, 产品净重):
         j = (单价每公斤 / 1000) * 产品净重
+        print("表面加工价格：" + str(j))
         return j
 
 
@@ -82,8 +85,8 @@ class ShippingCost:
         pass
 
     @staticmethod
-    def calculate(每车运费, 每车箱数, 每箱包装量):
-        return 每车运费 / 每车箱数 / 每箱包装量
+    def calculate(每车运费, 每车货物):
+        return 每车运费 / 每车货物
     
 def fullwidth_to_halfwidth(s):
     """Convert full-width characters to half-width characters."""

@@ -74,7 +74,7 @@ canvas {
     <div id="particles-js"></div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <a class="navbar-brand" href="/">
-            <img src="{% static 'logo.jpeg' %}" alt="Logo" style="width: 60px; height: 60px; margin-right: 10px;">
+            <img src="{% static 'logo.jpeg' %}" alt="Logo" style="width: 60px; height: 60px; margin-right: 10px; margin-left: 20px;">
             洽兴成本报价</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -95,7 +95,7 @@ canvas {
 
         <!-- Calculation Card -->
         <div class="card p-4 mb-5">
-            <form method="post" action="{% url 'calculate_'|add:category %}" id="form1">
+            <form method="post" action="{% url 'calculate_'|add:category %}?name={{ request.GET.name }}" id="form1">
                 {% csrf_token %}
                 <!-- <input type="hidden" name="form_name" value="form1"> -->
                 <input type="hidden" name="name" id="nameInput">
@@ -130,16 +130,20 @@ canvas {
                     </select>
                 </div>
 
+                <div class="form-group col-sm-3">
+                    <label>材料消耗系数:</label>
+                    <input type="float" min = "1" max = "100" class="form-control" name="material_coefficient" placeholder="如消耗为5%,输入1.05">
+                </div>
+
                 <div id="input-container">
                     <!-- Dynamic inputs will be appended here -->
-                  </div>
+                </div>
                 
 
                 <div class="form-group">
                     <button type="submit" class="btn btn-gradient btn-block mt-2">计算</button>
                 </div>
             </form>
-
         </div>
 
         <!-- Results Card -->
@@ -194,9 +198,10 @@ canvas {
                 {% endif %}
             </div>
 
-            <div class="col-md-6 ">
+            <div class="col-md-6 " style="margin-left: 170px;">
                 <canvas id="costChart" width="500" height="500"></canvas>
             </div>
+            <button id="saveRecord" style="width: 57px; margin-left: 650px;" class="btn btn-gradient mt-2">保存</button>
         </div>
     </div>
 
@@ -220,8 +225,8 @@ canvas {
     <script>
         $(document).ready(function() {
             $('select').select2(); // 初始化所有的下拉菜单
-});
-</script>
+    });
+    </script>
 
 <script>
 $(document).ready(function() {
@@ -277,29 +282,65 @@ $(document).ready(function() {
 </script>
 
 <script>
-
-
-
-const name = getURLParameter('name');
-if (name) {
-    localStorage.setItem('name', name);
-}
 const storedName = localStorage.getItem('name');
-if (storedName) {
-    const titleElement = document.querySelector('h1');
-    titleElement.textContent = `${storedName}成本计算`;
+
+function setUIFromName(storedName) {
+    if (storedName) {
+        document.getElementById('nameInput').value = storedName;
+        const titleElement = document.querySelector('h1');
+        titleElement.textContent = `${storedName}成本计算`;
+    }
 }
 
-window.addEventListener('DOMContentLoaded', (event) => {
-    const name = getURLParameter('name');
+$(document).ready(function() {
+    const name = getURLParameter('name') || localStorage.getItem('name');
     if (name) {
-        document.getElementById('nameInput').value = name;
-        const titleElement = document.querySelector('h1');
-        titleElement.textContent = `${name}成本计算`;
+        localStorage.setItem('name', name);
+        setUIFromName(name);
     }
+});
 
+</script>
+
+<script>
+    $(document).ready(function() {
+    $('#saveRecord').on('click', function() {
+        // Get values from the HTML
+        let product_info_part_number = $('[name="selected_product"] option:selected').text();
+        let material_result = "{{ material_result }}";
+        let processing_result = "{{ processing_result }}";
+        let packaging_result = "{{ packaging_result }}";
+        let shipping_result = "{{ shipping_result }}";
+        let managing_result = "{{ managing_result }}";
+        let profit = "{{ profit }}";
+        let total_cost = "{{ total_cost }}";
+
+        // Construct the post URL based on the current page's URL
+        let postURL = window.location.pathname;
+        if (!postURL.endsWith('/')) {
+            postURL += '/';
+        }
+        postURL += 'save_record/';
+
+        // Post data to the Django view
+        $.post(postURL, {
+            'product_info_part_number': product_info_part_number,
+            'material_result': material_result,
+            'processing_result': processing_result,
+            'packaging_result': packaging_result,
+            'shipping_result': shipping_result,
+            'managing_result': managing_result,
+            'profit': profit,
+            'total_cost': total_cost,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        }, function(data) {
+            // Handle the response (success or failure) here
+            alert("计算结果已保存！");
+        });
+    });
 });
 </script>
+    
 <script>
     $(document).ready(function() {
     const selectElement = $('#select2-equipment');
@@ -371,7 +412,7 @@ document.addEventListener("DOMContentLoaded", function () {
       labels: ['材料费', '加工费', '包装费', '运输费', '管理费', '利润'],
       datasets: [{
         data: [{{ material_result }}, {{ processing_result }}, {{ packaging_result }}, {{ shipping_result }}, {{ managing_result }}, {{ profit }}],
-        backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#48de73', '#f26d6d']
+        backgroundColor: ['#e53935', '#1e88e5', '#8e24aa', '#fbc02d', '#43a047', '#f57c00']
       }]
     };
 

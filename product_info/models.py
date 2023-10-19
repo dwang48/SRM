@@ -31,7 +31,7 @@ class Product(models.Model):
     transport_type = models.CharField(max_length=255, verbose_name='运输车型',null=True,blank=True)
     transport_distance = models.FloatField(verbose_name='运输距离 （公里）',null=True,blank=True)
     transport_fee_per_vehicle = models.FloatField(verbose_name='每车运费',null=True,blank=True)
-    cartons_per_vehicle = models.IntegerField(verbose_name='每车箱数',null=True,blank=True)
+    cartons_per_vehicle = models.IntegerField(verbose_name='每车包装量',null=True,blank=True)
     management_fee_percentage = models.FloatField(verbose_name='管理费用 (%)',null=True,blank=True)
     profit_margin_percentage = models.FloatField(verbose_name='利润率 (%)',null=True,blank=True)
 

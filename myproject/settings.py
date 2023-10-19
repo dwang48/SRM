@@ -76,7 +76,7 @@ INSTALLED_APPS = [
     "material_price_info",
     "cost_analysis",
     "home",
-    "processing_info",
+    # "processing_info",
 ]
 
 MIDDLEWARE = [
