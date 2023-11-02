@@ -1,6 +1,6 @@
 from django.contrib import admin
 from import_export import resources,fields
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportModelAdmin,ExportActionMixin
 from .models import Vendor
 from django.http import HttpResponse
 
@@ -39,6 +39,7 @@ class VendorResource(resources.ModelResource):
     water_price = fields.Field(attribute='water_price', column_name='水价（元/吨）')
     gas_price = fields.Field(attribute='gas_price', column_name='燃气价（元/立方米）')
     update_date = fields.Field(attribute='update_date', column_name='更新日期')
+    notes = fields.Field(attribute='notes', column_name='备注')
     
     class Meta:
         model = Vendor
@@ -48,8 +49,8 @@ class VendorResource(resources.ModelResource):
         exclude = ['id',]
 
 @admin.register(Vendor)
-class VendorAdmin(ImportExportModelAdmin):
-    actions=[export_to_excel]
+class VendorAdmin(ImportExportModelAdmin,ExportActionMixin):
+    # actions=[export_to_excel]
     resource_class = VendorResource
     search_fields = ['categories','supplier_name','supplier_code']
-    list_display = ['categories','supplier_name', 'supplier_code', 'production_location', 'currency_name', 'operator_wages', 'electricity_price', 'water_price', 'gas_price','update_date']
+    list_display = ['categories','supplier_name', 'supplier_code', 'production_location', 'currency_name', 'operator_wages', 'electricity_price', 'water_price', 'gas_price','update_date','notes']

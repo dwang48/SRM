@@ -1,5 +1,6 @@
 'use strict';
 {
+    
     window.addEventListener('load', function(e) {
 
         function setTheme(mode) {

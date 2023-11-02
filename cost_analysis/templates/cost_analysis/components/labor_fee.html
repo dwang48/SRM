@@ -1,0 +1,53 @@
+<div id="labor-cost-form">
+    <label style="font-size: 20px; margin-bottom: 10px">人工费用计算</label>
+
+    <div class="horizontal-input-group">
+        <div class="input-wrapper">
+            <label class="input-label">流水线人数</label>
+            <input type="number" id="line_worker_count" placeholder="" value="24" required />
+        </div>
+        <div class="input-wrapper">
+            <label class="input-label">操作工平均工资</label>
+            <input type="number" id="avg_worker_salary" placeholder="" value="240" required />
+        </div>
+    </div>
+
+    <div class="horizontal-input-group">
+        <div class="input-wrapper">
+            <label class="input-label">流水线小师傅人数</label>
+            
+            <input type="number" id="small_master_count" placeholder="" value="8" required />
+        </div>
+        <div class="input-wrapper">
+            <label class="input-label">流水线小师傅人工费用</label>
+            <input type="number" id="small_master_salary" placeholder="" value="346" required />
+        </div>
+    </div>
+
+    <div class="horizontal-input-group">
+        <div class="input-wrapper">
+            <label class="input-label">流水线大师傅人数</label>
+            <input type="number" id="big_master_count" placeholder="" value="8" required />
+        </div>
+        <div class="input-wrapper">
+            <label class="input-label">流水线大师傅人工费用</label>
+            <input type="number" id="big_master_salary" placeholder="" value="346" required />
+        </div>
+    </div>
+
+    <div class="horizontal-input-group">
+        <div class="input-wrapper">
+            <label class="input-label">总人工费（日）<span class="tool-tip-icon" data-toggle="tooltip" title="流水线人数*操作工平均工资+流水线小师傅人数*流水线小师傅人工费用+流水线大师傅人数*流水线大师傅人工费用">
+                <i class="fas fa-question-circle"></i>
+            </span></label>
+            <input type="number" id="total_daily_cost" readonly />
+        </div>
+        <div class="input-wrapper">
+            <label class="input-label">人工费（小时）<span class="tool-tip-icon" data-toggle="tooltip" title="总人工费/24">
+                <i class="fas fa-question-circle"></i>
+            </span></label>
+            <input type="number" id="total_hourly_cost" readonly />
+        </div>
+    </div>
+
+</div>

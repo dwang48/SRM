@@ -38,7 +38,7 @@ from cost_analysis import views
 #     path('shuamao/', views.calculate_cost, name='calculate_shuamao'),
 # ]
 categories = [
-    'suliao', 'zhusu', 'penwu', 'diandu', 'tangjin', 'yinshua',
+    'suliao', 'zhusu', 'pentu', 'diandu', 'tangjin', 'yinshua',
     'penhui', 'zuzhuang', 'chongya', 'paoguang', 'yanghua', 'suanxi',
     'kezi', 'citie', 'chuizhong', 'tanhuan', 'lvjianchengpin', 'zhanban',
     'zhixiang', 'baozhuangdai', 'caihe', 'xisupan', 'zhuanyinzhi', 
@@ -50,5 +50,6 @@ urlpatterns = []
 for category in categories:
     calculate_path = path(f'{category}/', views.calculate_cost, name=f'calculate_{category}')
     save_record_path = path(f'{category}/save_record/', views.save_record, name=f'save_record_{category}')
+    # process_data_path = path(f'{category}/process_data/',views.process_data, name=f'process_data_{category}')
 
     urlpatterns.extend([calculate_path, save_record_path])

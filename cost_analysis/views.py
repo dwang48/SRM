@@ -2,6 +2,7 @@ from material_price_info.models import *
 from equipment_info.models import Equipment
 from product_info.models import Product
 from vendor_info.models import Vendor
+from material_price_info.models import MaterialPrice
 from .utils import *
 from .models import Record
 from django.shortcuts import render
@@ -23,20 +24,53 @@ class CostCalculator:
         data = {}
         for key in keys:
             value = self.request.POST.get(key, None)
-            data[key] = float(value) if value and value.isnumeric() else 0
+            # Try to convert the value to a float, and if it fails, default to 0
+            try:
+                data[key] = float(value)
+            except (TypeError, ValueError):
+                data[key] = 0  # default value if conversion fails
         return data
 
-    def calculate_process_cost(self, manufacturing_process, equipment):
 
+    def calculate_process_cost(self, manufacturing_process, equipment):
+        operator_count_key = f'operator_count_{manufacturing_process}|{equipment.equipment_name}|{equipment.equipment_model}'
+        qualification_rate_key = f'qualification_rate_{manufacturing_process}|{equipment.equipment_name}|{equipment.equipment_model}'
+        times_key = f'times_{manufacturing_process}|{equipment.equipment_name}|{equipment.equipment_model}'
+        hourly_capacity_key = f'hourly_capacity_{manufacturing_process}|{equipment.equipment_name}|{equipment.equipment_model}'
+        operator_wages_key = f'operator_wages_{manufacturing_process}|{equipment.equipment_name}|{equipment.equipment_model}'
         # Extracting necessary data from request.POST
-        keys = [
-            f"hourly_capacity_{manufacturing_process}|{equipment.equipment_name}|{equipment.equipment_model}",
-            f"qualification_rate_{manufacturing_process}|{equipment.equipment_name}|{equipment.equipment_model}",
-            f"times_{manufacturing_process}|{equipment.equipment_name}|{equipment.equipment_model}",
-            f"operator_count_{manufacturing_process}|{equipment.equipment_name}|{equipment.equipment_model}",
-            f"operator_wages_{manufacturing_process}|{equipment.equipment_name}|{equipment.equipment_model}"
-        ]
+        keys = [operator_count_key,operator_wages_key,qualification_rate_key,times_key,hourly_capacity_key]
         data = self.get_post_data(keys)
+        # 对于操作员工资
+       
+        if not data.get(operator_wages_key):
+            operator_wages = self.vendor.operator_wages  # 使用默认值
+        else:
+            operator_wages = data.get(operator_wages_key)
+
+        # 对于操作员人数
+        if not data.get(operator_count_key):
+            operator_count = self.product.operator_count  # 使用默认值
+        else:
+            operator_count = data.get(operator_count_key)
+
+        # 对于合格率
+        if not data.get(qualification_rate_key):
+            qualification_rate = 100  # 使用默认值
+        else:
+            qualification_rate = data.get(qualification_rate_key)
+
+        # 对于次数
+        if not data.get(times_key):
+            times = 1  # 使用默认值
+        else:
+            times = data.get(times_key)
+
+        # 对于每小时产能
+        if not data.get(hourly_capacity_key):
+            hourly_capacity = self.product.hourly_capacity  # 使用默认值
+        else:
+            hourly_capacity = data.get(hourly_capacity_key)
         
         if manufacturing_process == '表面加工处理':
             params = {
@@ -44,22 +78,71 @@ class CostCalculator:
                 '产品净重': self.product.part_net_weight,
             }
             return ProcessCost.surface_cost(**params)
-            
-        # Setting up the parameters for ProcessCost.calculate
+        
         params = {
             '设备现价值': equipment.current_value,
             '剩余折旧年数': equipment.remaining_depreciation_years,
-            '每小时产能': data.get('hourly_capacity', 1),
+            '每小时产能': hourly_capacity,
             '设备功率': equipment.power_kw,
+            '辅助功率1': equipment.auxiliary_power_a_kw,
+            '辅助功率2': equipment.auxiliary_power_b_kw,
+            '辅助功率3': equipment.auxiliary_power_c_kw,
             '电价': self.vendor.electricity_price,
-            '操作员工资': data.get('operator_wages', self.vendor.operator_wages),
-            '操作员人数': data.get('operator_count', self.product.operator_count),
-            '合格率': data.get('qualification_rate', 1),
-            '次数': data.get('times', 1)
+            '操作员工资': operator_wages,
+            '操作员人数': operator_count,
+            '合格率': qualification_rate,
+            '次数': times,
+            '每小时耗水量': equipment.water_consumption,
+            '水单价': self.vendor.water_price,
+            '每小时耗气量': equipment.gas_consumption,
+            '气单价': self.vendor.gas_price,
+            '每小时其他资源耗用量': equipment.other_resource_consumption,
+            '其他单价': equipment.other_resource_price,
+            '每小时附加资源耗用量': equipment.additional_resource_consumption,
+            '附加单价': equipment.additional_resource_price,
+            '附加资源2': equipment.additional_resource_consumption2,
+            '附加单价2': equipment.additional_resource_price2,
+            '附加资源3': equipment.additional_resource_consumption3,
+            '附加单价3': equipment.additional_resource_price3
         }
-        return ProcessCost.calculate(**params)
+
+        print(params)
+        return ProcessCost.有材料消耗类成本(**params)
+
         # ... (handle other manufacturing processes if needed)
 
+    def calculate_total_material_cost(self, selected_material_ids,request):
+        """
+        计算选定材料的成本。
+
+        参数:
+        - selected_material_ids: 选中的材料的ID列表。
+        """
+        total_material_cost = 0
+
+        for material_id in selected_material_ids:
+            # 假设有一个方法能根据material_id取得材料的信息，如价格等
+            material = MaterialPrice.objects.get(id=material_id)  # 请根据实际情况调整这里的查询
+
+            # 从请求中获取材料所需参数的数据
+            weight_or_count = request.POST.get(f'weight_or_count_{material_id}')
+            net_weight_input = request.POST.get(f'net_weight_{material_id}')
+            consumption_coefficient = request.POST.get(f'consumption_coefficient_{material_id}')
+
+            # 处理可能的空值，设置默认值或进行类型转换
+            # 获取必要的参数
+            产品毛重 =  float(weight_or_count)# 需要从某处获取或定义这个值
+            if not net_weight_input:
+                产品净重 = float(weight_or_count)  # 假设默认净重与毛重相同
+            else:
+                产品净重 = float(net_weight_input) 
+            废料价格 = material.scrap_price# 需要从某处获取或定义这个值
+            系数 =  float(consumption_coefficient)# 需要从某处获取或定义这个值
+
+            # 计算当前材料的成本并累加至总成本
+            total_material_cost += MaterialCost.calculate(产品毛重, material.price, 产品净重, 废料价格, 系数)
+
+        return total_material_cost
 
 def calculate_processing_cost(request):
     # Get selected equipment data list from request
@@ -70,7 +153,7 @@ def calculate_processing_cost(request):
     product = Product.objects.get(id=selected_product_id)
 
     # Fetch the vendor object using the supplier name from the product object
-    vendor = Vendor.objects.get(supplier_name=product.supplier)
+    vendor = Vendor.objects.get(supplier_code=product.supplier_code)
 
     # Create a calculator instance with the request, product, and vendor objects
     calculator = CostCalculator(request, product, vendor)
@@ -112,10 +195,10 @@ def calculate_cost(request):
     else:
         category_name = request.POST.get('name')
     
-    print(category_name)
+    # print(category_name)
 
     model_name = f"MaterialPrice"
-    print(model_name)
+    # print(model_name)
 
     # 动态获取模型
     try:
@@ -141,9 +224,10 @@ def calculate_cost(request):
     products = Product.objects.filter(categories=category_name)
     # products = Product.objects.all()
     # Equipments = Equipment.objects.all()
-    manufacturing_process = Equipment.objects.filter(purchase_category=category_name).values_list('manufacturing_process',flat=True).distinct()
+    manufacturing_process = Equipment.objects.filter(category=category_name).values_list('manufacturing_process',flat=True).distinct()
     # manufacturing_process = Equipment.objects.values_list('manufacturing_process',flat=True).distinct()
     manufacturing_data = []
+    all_materials = ModelClass.objects.filter(categories=category_name)
 
     for process in manufacturing_process:
         process_data = {
@@ -169,6 +253,10 @@ def calculate_cost(request):
         manufacturing_data.append(process_data)
 
     if request.method == "POST":
+        additional_material_cost = float(request.POST.get('additional_material_cost', 0))
+        additional_packaging_cost = float(request.POST.get('additional_packaging_cost', 0))
+        additional_transport_cost = float(request.POST.get('additional_transport_cost', 0))
+        additional_process_cost = float(request.POST.get('additional_process_cost', 0))
         selected_product_id = request.POST.get('selected_product')
         product_info = Product.objects.get(id=selected_product_id)
         # vendor_info = Vendor.objects.get(supplier_name=product_info.supplier)
@@ -186,21 +274,27 @@ def calculate_cost(request):
 
         # 计算材料费
         material_result = MaterialCost.calculate(product_gross_weight,material_info.price,product_net_weight,material_info.scrap_price,material_coefficient)
+        
+        material_result += additional_material_cost
+
         material_result = round(material_result,4)
         # material_result_rounded = round(material_result,3)
 
         #计算包装费
         packaging_result = PackagingCost.calculate(product_info.carton_price,product_info.pieces_per_carton,product_info.pe_bag_price,product_info.pieces_per_bag)
+        packaging_result += additional_packaging_cost
         packaging_result = round(packaging_result,4)
         # packaging_result_rounded = round(packaging_result,3)
 
         #计算运输费
         shipping_result = ShippingCost.calculate(product_info.transport_fee_per_vehicle,product_info.cartons_per_vehicle)
+        shipping_result += additional_transport_cost
         shipping_result = round(shipping_result,4)
 
         #计算加工费
         processing_result = calculate_processing_cost(request)
         # material_result_rounded = round(material_result,3)
+        processing_result += additional_process_cost
         processing_result = round(processing_result,4)
 
         #显示加工费明细
@@ -225,20 +319,13 @@ def calculate_cost(request):
         total_cost = (material_result + packaging_result + shipping_result + processing_result)*(1+management_fee_percentage)*(1+profit_margin_percentage)*1.13
         total_cost = round(total_cost,4)
 
-        # new_record = Record(
-        # 产品编号=product_info.part_number,
-        # 材料费=material_result,
-        # 加工费=processing_result,
-        # 加工明细=processing_details,
-        # 运输费=shipping_result,
-        # 包装费=packaging_result,
-        # 管理费比例=management_fee_percentage,
-        # 利润率=profit_margin_percentage,
-        # 总成本=total_cost 
-        # )
-        # new_record.save()
+        
+    if category in ['zhusu','pentu']:
+        template_name = f"cost_analysis/calculate_{category}.html"
+    else:
+        template_name = "cost_analysis/calculate.html"
 
-    return render(request, 'cost_analysis/calculate.html', {
+    return render(request, template_name, {
         'category': category,
         'manufacturing_data': manufacturing_data,
         'products': products,
@@ -250,25 +337,30 @@ def calculate_cost(request):
         'managing_result':managing_result,
         'profit':profit,
         'material_coefficient': material_coefficient,
-        # 'selected_methods':selected_methods,
+        "all_materials": all_materials
     })
 
 
 @csrf_exempt
 def save_record(request):
     if request.method == "POST":
-        new_record = Record(
-            产品编号=request.POST.get('product_info_part_number'),
-            材料费=request.POST.get('material_result'),
-            加工费=request.POST.get('processing_result'),
-            包装费=request.POST.get('packaging_result'),
-            运输费=request.POST.get('shipping_result'),
-            管理费比例=request.POST.get('managing_result'),
-            利润率=request.POST.get('profit'),
-            总成本=request.POST.get('total_cost')
-        )
-        new_record.save()
-        return JsonResponse({"status": "success"})
+        print("Received POST data:", request.POST)
+        try:
+            new_record = Record(
+                产品编号=request.POST.get('product_info_part_number'),
+                材料费=float(request.POST.get('material_result', '0.0')),
+                加工费=float(request.POST.get('processing_result', '0.0')),
+                包装费=float(request.POST.get('packaging_result', '0.0')),
+                运输费=float(request.POST.get('shipping_result', '0.0')),
+                管理费比例=float(request.POST.get('managing_result', '0.0')),
+                利润率=float(request.POST.get('profit', '0.0')),
+                总成本=float(request.POST.get('total_cost', '0.0'))
+            )
+            new_record.save()
+            return JsonResponse({"status": "success"})
+        except ValueError:
+            return JsonResponse({"status": "error", "message": "Invalid input data"})
     else:
-        return JsonResponse({"status": "error"})
+        return JsonResponse({"status": "error", "message": "Invalid request"})
 
+    

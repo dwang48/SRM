@@ -1,5 +1,5 @@
 from import_export import resources,fields
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportModelAdmin,ExportActionMixin
 from .models import Product
 from django.contrib import admin
 from django.http import HttpResponse
@@ -61,6 +61,7 @@ class ProductResource(resources.ModelResource):
     cartons_per_vehicle = fields.Field(attribute='cartons_per_vehicle', column_name="每车包装量")
     management_fee_percentage = fields.Field(attribute='management_fee_percentage', column_name="管理费用\n(%)")
     profit_margin_percentage = fields.Field(attribute='profit_margin_percentage', column_name="利润率\n(%)")
+    notes = fields.Field(attribute='notes', column_name="备注")
 
     class Meta:
         model = Product
@@ -70,8 +71,8 @@ class ProductResource(resources.ModelResource):
         import_id_fields = ('part_number',)
 
 # @admin.register(Product)
-class ProductAdmin(ImportExportModelAdmin):
-    actions = [export_to_excel]
+class ProductAdmin(ImportExportModelAdmin,ExportActionMixin):
+    # actions = [export_to_excel]
     resource_class = ProductResource
     list_display = ('categories',
         'purchase_part', 'part_number', 'part_length', 'part_width',
@@ -81,7 +82,7 @@ class ProductAdmin(ImportExportModelAdmin):
         'annual_demand', 'standard_packaging_length', 'standard_packaging_width',
         'standard_packaging_height', 'carton_price', 'pieces_per_carton', 'pe_bag_price',
         'pieces_per_bag', 'transport_type', 'transport_distance', 'transport_fee_per_vehicle',
-        'cartons_per_vehicle', 'management_fee_percentage', 'profit_margin_percentage',
+        'cartons_per_vehicle', 'management_fee_percentage', 'profit_margin_percentage','notes'
     )
     search_fields = ('categories','purchase_part', 'part_number')
 

@@ -8,73 +8,20 @@
     <title>成本计算</title>
     <link href="{% static 'bootstrap.min.css' %}", rel="stylesheet">
     <link rel="stylesheet" href="{% static 'cost_analysis/styles.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.3/umd/popper.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="{% static 'js/particles.js' %}"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .display-4 {
-    color: #fff;
-}
-.narrow-container {
-    max-width: 800px;
-}
-.navbar.bg-primary, .btn-gradient{
-    background: linear-gradient(to right, rgb(112, 151, 183), rgb(163, 154, 164));
-    opacity: 0.9;
-}
-
-body .text-gradient{
-    background: linear-gradient(to right, rgb(112, 151, 183), rgb(163, 154, 164));
-    color:white
-}
-.btn-gradient{
-    color:white;
-    border:none;
-}
-#particles-js {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
-body {
-    background: radial-gradient(circle, #000000, #797878);
-}
-body::before {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0.2;
-}
-footer {
-    font-size: 20px;
-    color:#fff;
-}
-.card {
-    background: linear-gradient(to bottom, #ffffff, #f1f1f1);
-    opacity: 0.9;
-}
-
-canvas {
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    width: 700px;
-}
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/calculate.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
+
 <body>
-    <div id="particles-js"></div>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <a class="navbar-brand" href="/">
-            <img src="{% static 'logo.jpeg' %}" alt="Logo" style="width: 60px; height: 60px; margin-right: 10px; margin-left: 20px;">
+            <img src="{% static 'logo.jpeg' %}" alt="Logo" class="img-fluid" style="width: 60px; height: 60px; margin-right: 10px; margin-left: 20px;">
             洽兴成本报价</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -88,349 +35,230 @@ canvas {
         </div>
     </nav>
 
-    <div class="container mt-5 narrow-container">
+    <div class="mt-5">
         <div class="text-center mb-5">
             <h1 class="display-4">成本计算</h1>
         </div>
 
+        <div class="row" style="padding-left: 20px;">
         <!-- Calculation Card -->
-        <div class="card p-4 mb-5">
-            <form method="post" action="{% url 'calculate_'|add:category %}?name={{ request.GET.name }}" id="form1">
-                {% csrf_token %}
-                <!-- <input type="hidden" name="form_name" value="form1"> -->
-                <input type="hidden" name="name" id="nameInput">
-                <div class="form-group">
-                    <label>选择零件编号:</label>
-                    <select name="selected_product" class="form-control">
-                        {% for product in products %}
-                        <option value="{{ product.id }}" {% if product.id|stringformat:"s" == request.POST.selected_product %}selected{% endif %}>
-                            {{ product.part_number }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="form-group mt-2">
-                    <label>选择制造工艺、设备名称和设备型号:</label>
-                    <select name="selected_equipment" class="form-control" multiple id="select2-equipment">
-                        {% for item in manufacturing_data %}
-                        <optgroup label="{{ item.process }}">
-                            {% for equipment in item.equipments %}
-                            {% for model in equipment.models %}
-                            {% with item_value=item.process|add:"|"|add:equipment.name|add:"|"|add:model %}
-                            <option value="{{ item_value }}"
-                                    {% if item_value in selected_equipments %}selected{% endif %}>
-                                {{ equipment.name }} - {{ model }}
+        <div class="col-md-4">
+            <div class="card p-4 mb-5 scrollable-card">
+                {% block calculation_card %}
+                {% endblock %}
+                <form method="post" action="{% url 'calculate_'|add:category %}?name={{ request.GET.name }}" id="form1">
+                    {% csrf_token %}
+                    <!-- <input type="hidden" name="form_name" value="form1"> -->
+                    <input type="hidden" name="name" id="nameInput">
+                    <div class="form-group">
+                        <label>选择零件编号:</label>
+                        <select name="selected_product" class="form-control">
+                            {% for product in products %}
+                            <option value="{{ product.id }}" {% if product.id|stringformat:"s" == request.POST.selected_product %}selected{% endif %}>
+                                {{ product.part_number }}
                             </option>
-                            {% endwith %}
                             {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group col-sm-4">
+                        <label>材料消耗系数:</label>
+                        <input type="decimal" min = "1" max = "100" value= "1.05" class="form-control" name="material_coefficient" placeholder="如消耗为5%,输入1.05" >
+                    </div>
+
+                    <div id="input-container-material">
+                    
+                    </div>
+
+
+                    <div class="form-group mt-2">
+                        <label>选择制造工艺、设备名称和设备型号:</label>
+                        <select name="selected_equipment" class="form-control" multiple id="select2-equipment">
+                            {% for item in manufacturing_data %}
+                            <optgroup label="{{ item.process }}">
+                                {% for equipment in item.equipments %}
+                                {% for model in equipment.models %}
+                                {% with item_value=item.process|add:"|"|add:equipment.name|add:"|"|add:model %}
+                                <option value="{{ item_value }}"
+                                        {% if item_value in selected_equipments %}selected{% endif %}>
+                                    {{ equipment.name }} - {{ model }}
+                                </option>
+                                {% endwith %}
+                                {% endfor %}
+                                {% endfor %}
+                            </optgroup>
                             {% endfor %}
-                        </optgroup>
-                        {% endfor %}
-                    </select>
-                </div>
+                        </select>
+                    </div>
 
-                <div class="form-group col-sm-3">
-                    <label>材料消耗系数:</label>
-                    <input type="float" min = "1" max = "100" class="form-control" name="material_coefficient" placeholder="如消耗为5%,输入1.05">
-                </div>
+                    <!-- <b utton class="btn btn-primary" id="addMaterialButton">添加材料</button> -->
+                    
+                    
 
-                <div id="input-container">
-                    <!-- Dynamic inputs will be appended here -->
-                </div>
-                
+                    <div id="input-container">
+                        <!-- Dynamic inputs will be appended here -->
+                    </div>
+                    {% block additional_cost %}
+                    {% endblock %}
+                    
 
-                <div class="form-group">
-                    <button type="submit" class="btn btn-gradient btn-block mt-2">计算</button>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-gradient btn-block mt-2" id="calculate">计算</button>
+                    </div>
+                </form>
+            </div>
+    </div>
+
+        <!-- Chart in the middle -->
+        <div class="col-md-4">
+            <!-- Card for the first chart -->
+                <div class="card p-4 mb-5">
+                    <div class="d-flex justify-content-center">
+                        <canvas id="costChart" width="200" height="200"></canvas>
+                    </div>
+                    <!-- <div class="justify-content-center">
+                        <canvas id="costBarChart" width="200" height="200"></canvas>
+                    </div> -->
                 </div>
-            </form>
         </div>
 
         <!-- Results Card -->
+        <div class="col-md-4">
         <div class="card p-4">
             <h1 class = "text-center">费用统计</h1>
-            <div class="mb-4">
-                <h2>材料费</h2>
-                {% if material_result is not None %}
-                <p class="text-gradient text-black p-2 rounded"><strong>结果:</strong> {{ material_result }}</p>
-                {% endif %}
-            </div>
+            <button class="btn btn-gradient  btn-block mt-2 col-sm-3" style="margin-top: 0px; margin-bottom: 50px;" id="expandAll">关闭全部</button>
 
-            <div class="mb-4">
-                <h2>加工费</h2>
-                {% if processing_result is not None %}
-                <p class="text-gradient text-black p-2 rounded"><strong>结果:</strong> {{ processing_result }}</p>
-                {% endif %}
-            </div>
-
-            <div class="mb-4">
-                <h2>包装费</h2>
-                {% if packaging_result is not None %}
-                <p class="text-gradient text-black p-2 rounded"><strong>结果:</strong> {{ packaging_result }}</p>
-                {% endif %}
-            </div>
-
-            <div class="mb-4">
-                <h2>运输费</h2>
-                {% if shipping_result is not None %}
-                <p class="text-gradient text-black p-2 rounded"><strong>结果:</strong> {{ shipping_result }}</p>
-                {% endif %}
-            </div>
-            
-            <div class="mb-4">
-                <h2>管理费</h2>
-                {% if processing_result is not None %}
-                <p class="text-gradient text-black p-2 rounded"><strong>结果:</strong> {{ managing_result }}</p>
-                {% endif %}
-            </div>
-
-            <div class="mb-4">
-                <h2>利润</h2>
-                {% if processing_result is not None %}
-                <p class="text-gradient text-black p-2 rounded"><strong>结果:</strong> {{ profit }}</p>
-                {% endif %}
-            </div>
-
-            <div class="mb-4">
-                <h2>总成本</h2>
-                {% if total_cost is not None %}
-                <p class="text-gradient text-black p-2 rounded"><strong>结果:</strong> {{ total_cost }}</p>
-                {% endif %}
-            </div>
-
-            <div class="col-md-6 " style="margin-left: 170px;">
-                <canvas id="costChart" width="500" height="500"></canvas>
-            </div>
-            <button id="saveRecord" style="width: 57px; margin-left: 650px;" class="btn btn-gradient mt-2">保存</button>
-        </div>
-    </div>
-
-    <!-- <script>
-        document.getElementById('saveButton').addEventListener('click', function() {
-        document.getElementById('saveFlag').value = 'true';
-    });
-    </script> -->
-
-
-    <script>
-        function getURLParameter(name) {
-            var match = new RegExp('[?|&]' + name + '=([^&;]+?)(&|#|;|$)').exec(location.search);
-            if (match) {
-                return decodeURIComponent(match[1].replace(/\+/g, '%20'));
-            }
-            return null;
-        }
-    </script>
-
-    <script>
-        $(document).ready(function() {
-            $('select').select2(); // 初始化所有的下拉菜单
-    });
-    </script>
-
-<script>
-$(document).ready(function() {
-    const selectElement = $('#select2-equipment');
-    const inputContainer = $("#input-container");
-
-    // Initialize Select2
-    selectElement.select2();
-
-    // Event listener for Select2 change
-    selectElement.on('change', function() {
-        const selectedOptions = $(this).val() || [];
-        updateDynamicFields(selectedOptions);
-    });
-
-    function updateDynamicFields(selectedOptions) {
-        // Clear existing fields
-        inputContainer.empty();
-
-        // Create new fields based on selected options
-        selectedOptions.forEach(optionValue => {
-            const label = $(`option[value="${optionValue}"]`).text();
-            const inputGroup = $(`
-                <div class="input-group mb-3" id="group_${optionValue}">
-                    <div class="col-sm-4">
-                        <label>${label} 合格率:</label>
-                        <input type="number" min = "1" max = "100" class="form-control" name="qualification_rate_${optionValue}" placeholder="合格率(%)">
+            <div class="accordion" id="accordionResults">
+        
+                <!-- Single accordion item example -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            材料费
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionResults">
+                        <div class="accordion-body">
+                            <strong>结果:</strong> {{ material_result }}
+                        </div>
                     </div>
-                    <div class="col-sm-4">
-                        <label>每小时产能:</label>
-                        <input type="number" min = "1" class="form-control" name="hourly_capacity_${optionValue}" placeholder="每小时产能(个)">
-                    </div>
-                    <div class="col-sm-4">
-                        <label>工艺次数:</label>
-                        <input type="number" min = "1" class="form-control" name="times_${optionValue}" placeholder="1">
-                    </div>
-                    <div class="col-sm-4">
-                        <label>操作员人数:</label>
-                        <input type="number" min = "0" class="form-control" name="operator_count_${optionValue}" placeholder="默认产品信息的人数">
-                    </div>
-                    <div class="col-sm-4">
-                        <label>操作员工资:</label>
-                        <input type="number" min = "0" class="form-control" name="operator_wages_${optionValue}" placeholder="默认供应商信息的工资">
-                    </div>
-
                 </div>
-            `);
-            inputContainer.append(inputGroup);
-        });
-    }
-});
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                            加工费
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionResults">
+                        <div class="accordion-body">
+                            <strong>结果:</strong> {{ processing_result }}
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingZero">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZero" aria-expanded="true" aria-controls="collapseZero">
+                            包装费
+                        </button>
+                    </h2>
+                    <div id="collapseZero" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionResults">
+                        <div class="accordion-body">
+                            <strong>结果:</strong> {{ packaging_result }}
+                        </div>
+                    </div>
+                </div>
+                <!-- Accordion for 运输费 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                            运输费
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse show" aria-labelledby="headingThree" data-bs-parent="#accordionResults">
+                        <div class="accordion-body">
+                            <strong>结果:</strong> {{ shipping_result }}
+                        </div>
+                    </div>
+                </div>
 
-</script>
+                <!-- Accordion for 管理费 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                            管理费
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse show" aria-labelledby="headingFour" data-bs-parent="#accordionResults">
+                        <div class="accordion-body collapsed">
+                            <strong>结果:</strong> {{ managing_result }}
+                        </div>
+                    </div>
+                </div>
 
-<script>
-const storedName = localStorage.getItem('name');
+                <!-- Accordion for 利润 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFive">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                            利润
+                        </button>
+                    </h2>
+                    <div id="collapseFive" class="accordion-collapse collapse show" aria-labelledby="headingFive" data-bs-parent="#accordionResults">
+                        <div class="accordion-body collapsed">
+                            <strong>结果:</strong> {{ profit }}
+                        </div>
+                    </div>
+                </div>
 
-function setUIFromName(storedName) {
-    if (storedName) {
-        document.getElementById('nameInput').value = storedName;
-        const titleElement = document.querySelector('h1');
-        titleElement.textContent = `${storedName}成本计算`;
-    }
-}
+                <!-- Accordion for 总成本 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSix">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
+                            总成本
+                        </button>
+                    </h2>
+                    <div id="collapseSix" class="accordion-collapse collapse show" aria-labelledby="headingSix" data-bs-parent="#accordionResults">
+                        <div class="accordion-body collapsed">
+                            <strong>结果:</strong> {{ total_cost }}
+                        </div>
+                    </div>
+                </div>
+                                <!-- Repeat for other costs like 加工费, 包装费, etc. -->
+                        
+                            </div> 
+                            <button id="saveRecord" style="width: 80px; margin-right: 100px;" class="btn btn-gradient mt-3 fade-in-element">保存</button>
+                        </div>
+                    </div>
+                </div>
+        </div>
 
-$(document).ready(function() {
-    const name = getURLParameter('name') || localStorage.getItem('name');
-    if (name) {
-        localStorage.setItem('name', name);
-        setUIFromName(name);
-    }
-});
-
-</script>
-
-<script>
-    $(document).ready(function() {
-    $('#saveRecord').on('click', function() {
-        // Get values from the HTML
-        let product_info_part_number = $('[name="selected_product"] option:selected').text();
-        let material_result = "{{ material_result }}";
-        let processing_result = "{{ processing_result }}";
-        let packaging_result = "{{ packaging_result }}";
-        let shipping_result = "{{ shipping_result }}";
-        let managing_result = "{{ managing_result }}";
-        let profit = "{{ profit }}";
-        let total_cost = "{{ total_cost }}";
-
-        // Construct the post URL based on the current page's URL
-        let postURL = window.location.pathname;
-        if (!postURL.endsWith('/')) {
-            postURL += '/';
-        }
-        postURL += 'save_record/';
-
-        // Post data to the Django view
-        $.post(postURL, {
-            'product_info_part_number': product_info_part_number,
-            'material_result': material_result,
-            'processing_result': processing_result,
-            'packaging_result': packaging_result,
-            'shipping_result': shipping_result,
-            'managing_result': managing_result,
-            'profit': profit,
-            'total_cost': total_cost,
-            'csrfmiddlewaretoken': '{{ csrf_token }}'
-        }, function(data) {
-            // Handle the response (success or failure) here
-            alert("计算结果已保存！");
-        });
-    });
-});
-</script>
-    
-<script>
-    $(document).ready(function() {
-    const selectElement = $('#select2-equipment');
-
-    // 初始化 Select2
-    selectElement.select2();
-
-    // 从 LocalStorage 获取保存的选项
-    const selectedItems = localStorage.getItem('selectedEquipment');
-    if (selectedItems) {
-        const items = JSON.parse(selectedItems);
-        selectElement.val(items).trigger('change');
-    }
-
-    // 当用户更改选择时保存到 LocalStorage
-    selectElement.on('change', function() {
-        const selected = $(this).val();
-        localStorage.setItem('selectedEquipment', JSON.stringify(selected));
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-            particlesJS.load('particles-js', '{% static "js/particles.json" %}', function() {
-                console.log('particles.js loaded - callback');
-            });
-        });
-</script>
-
-
-
-<script>
-// 在已有的 DOMContentLoaded 函数内部添加以下内容
-document.addEventListener("DOMContentLoaded", function () {
-    // ...（你原有的代码）
-
-    const submitButton = document.querySelector("button[type='submit']"); // 获取已存在的提交按钮
-
-    submitButton.addEventListener('click', function (e) {
-        validateInputs(e);
-    });
-
-    function validateInputs(e) {
-        const inputGroups = document.querySelectorAll('.input-group');
-
-        for (const group of inputGroups) {
-            const qualificationInput = group.querySelector("input[name^='qualification_rate_']");
-            const hourlyCapacityInput = group.querySelector("input[name^='hourly_capacity_']");
-
-            if (!qualificationInput.value || !hourlyCapacityInput.value) {
-                alert('未输入每小时产能或合格率！');
-                e.preventDefault();
-                return;
-            }
-        }
-    }
-});
-
-
-</script>
-
+<script src="{% static 'js/calculate.js' %}"></script>
 
 <script src="{%static 'bootstrap.min.js' %}"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // 数据用于扇形图，用动态值替换这些
+// 数据用于扇形图，用动态值替换这些
     const data = {
-      labels: ['材料费', '加工费', '包装费', '运输费', '管理费', '利润'],
-      datasets: [{
-        data: [{{ material_result }}, {{ processing_result }}, {{ packaging_result }}, {{ shipping_result }}, {{ managing_result }}, {{ profit }}],
-        backgroundColor: ['#e53935', '#1e88e5', '#8e24aa', '#fbc02d', '#43a047', '#f57c00']
-      }]
-    };
+        labels: ['材料费', '加工费', '包装费', '运输费', '管理费', '利润'],
+    datasets: [{
+        data: [{{ material_result }}, {{ processing_result }},{{ packaging_result }}, {{ shipping_result }}, {{ managing_result }}, {{ profit }}],
+        backgroundColor: ['#a42823', '#1565c0', '#6a1b9a', '#d49a00', '#2e7d32', '#bf6a00']
+    }]
+};
 
     // 创建图表
     const ctx = document.getElementById('costChart').getContext('2d');
     new Chart(ctx, {
-      type: 'pie',
-      data: data
-    });
-  </script>
+        type: 'doughnut',
+    data: data
+});
+
+</script>
 
 
+{%block scripts %}
+{% endblock %}
 
-<footer class="mt-5">
-    <div class="text-center">
-        <p>&copy; Etale.ai. All rights reserved.</p>
-    </div>
-</footer>
 
 </body>
 </html>

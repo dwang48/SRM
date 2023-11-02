@@ -1,7 +1,41 @@
 from django.db import models
 
 class Product(models.Model):
-    categories = models.CharField(max_length=255,verbose_name='类别')
+    category_choices = [('塑料成品', '塑料成品'),
+        ('注塑', '注塑'),
+        ('喷涂', '喷涂'),
+        ('电镀', '电镀'),
+        ('烫金', '烫金'),
+        ('印刷', '印刷'),
+        ('喷绘', '喷绘'),
+        ('组装', '组装'),
+        ('冲压', '冲压'),
+        ('抛光', '抛光'),
+        ('氧化', '氧化'),
+        ('酸洗', '酸洗'),
+        ('刻字', '刻字'),
+        ('磁铁', '磁铁'),
+        ('垂重', '垂重'),
+        ('弹簧', '弹簧'),
+        ('铝件成品', '铝件成品'),
+        ('栈板', '栈板'),
+        ('纸箱/纸板', '纸箱/纸板'),
+        ('包装袋', '包装袋'),
+        ('彩盒', '彩盒'),
+        ('吸塑盘', '吸塑盘'),
+        ('转印纸', '转印纸'),
+        ('垫片', '垫片'),
+        ('箔纸', '箔纸'),
+        ('标签', '标签'),
+        ('收缩膜', '收缩膜'),
+        ('模架', '模架'),
+        ('模芯', '模芯'),
+        ('玻璃管', '玻璃管'),
+        ('棉头', '棉头'),
+        ('镜片', '镜片'),
+        ('胶头', '胶头'),
+        ('刷毛', '刷毛')]
+    categories = models.CharField(max_length=255,verbose_name='类别',choices=category_choices)
     purchase_part = models.CharField(max_length=255, verbose_name='采购零件',null=True,blank=True)
     part_number = models.CharField(max_length=255, verbose_name='零件编号',null=True,blank=True)
     part_length = models.FloatField(verbose_name='零件尺寸 长（mm）',null=True,blank=True)
@@ -34,9 +68,8 @@ class Product(models.Model):
     cartons_per_vehicle = models.IntegerField(verbose_name='每车包装量',null=True,blank=True)
     management_fee_percentage = models.FloatField(verbose_name='管理费用 (%)',null=True,blank=True)
     profit_margin_percentage = models.FloatField(verbose_name='利润率 (%)',null=True,blank=True)
+    notes = models.TextField(null=True, blank=True, verbose_name="备注")
 
-    # def __str__(self,null=True,blank=True):
-    #     return self.purchase_part
     def __str__(self):
         return str(self.purchase_part) if self.purchase_part else ''
 

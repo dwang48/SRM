@@ -16,6 +16,9 @@ Including another URLconf
 """
 from django.urls import path, include
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,6 +26,9 @@ urlpatterns = [
     path('calculate/', include('cost_analysis.urls')), 
     path('',include('home.urls'))
 ]
+
+if settings.DEBUG: # 只在开发环境中直接通过 Django 服务媒体文件
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 admin.site.base_template = 'myproject/custom_admin_base.html'

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from import_export import resources,fields
-from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportModelAdmin,ExportActionMixin
 from .models import *
 from django.http import HttpResponse
 
@@ -34,6 +34,7 @@ export_to_excel.short_description = '导出Excel'
 class BaseMaterialPriceResource(resources.ModelResource):
     categories = fields.Field(attribute='categories', column_name='类别')
     supplier_name = fields.Field(attribute='supplier_name', column_name='供应商名称')
+    supplier_code = fields.Field(attribute='supplier_code', column_name='供应商编码')
     material_name = fields.Field(attribute='material_name', column_name='材料名称')
     material_grade = fields.Field(attribute='material_grade', column_name='材料牌号')
     measurement_unit = fields.Field(attribute='measurement_unit', column_name='计量单位')
@@ -41,6 +42,7 @@ class BaseMaterialPriceResource(resources.ModelResource):
     price = fields.Field(attribute='price', column_name='价格')
     scrap_price = fields.Field(attribute='scrap_price', column_name='废料价格')
     price_update_date = fields.Field(attribute='price_update_date', column_name='价格更新日期')
+    notes = fields.Field(attribute='notes', column_name='备注')
     
     class Meta:
         exclude = ('id',)
@@ -50,10 +52,10 @@ class BaseMaterialPriceResource(resources.ModelResource):
         import_id_fields = ['material_name',]
 
 # 公共 Admin 类
-class BaseMaterialPriceAdmin(ImportExportModelAdmin):
-    list_display = ['categories','supplier_name','material_name', 'material_grade', 'measurement_unit', 'pricing_currency', 'price', 'scrap_price', 'price_update_date']
-    list_filter = ['supplier_name']
-    search_fields = ['supplier_name', 'material_name']
+class BaseMaterialPriceAdmin(ImportExportModelAdmin,ExportActionMixin):
+    list_display = ['categories','supplier_name','supplier_code','material_name', 'material_grade', 'measurement_unit', 'pricing_currency', 'price', 'scrap_price', 'price_update_date','notes']
+    list_filter = ['supplier_name','supplier_code']
+    search_fields = ['supplier_name', 'material_name','supplier_code']
 
 
 class MaterialPriceResource(BaseMaterialPriceResource):
@@ -62,5 +64,5 @@ class MaterialPriceResource(BaseMaterialPriceResource):
 
 @admin.register(MaterialPrice)
 class MaterialPriceAdmin(BaseMaterialPriceAdmin):
-    actions=[export_to_excel]
+    # actions=[export_to_excel]
     resource_class = MaterialPriceResource

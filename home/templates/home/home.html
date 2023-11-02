@@ -20,13 +20,13 @@
         .narrow-container {
             max-width: 600px;  /* 设置你希望的最大宽度 */
         }
-        .navbar.bg-primary, .btn-gradient {
-            background: linear-gradient(to right, rgb(112, 151, 183), rgb(163, 154, 164));
+        .navbar.bg-primary {
+            background: rgb(112, 151, 183);
             opacity: 0.9;
         }
-        .btn-gradient{
-            color:white;
-            border:none;
+        .btn-gradient {
+            background: #e7f1ff;
+            opacity: 0.9;
         }
         #particles-js {
             position: absolute;
@@ -58,6 +58,7 @@
         }
         .card {
             background: linear-gradient(to bottom, #ffffff, #f1f1f1);  /* 使用新的渐变颜色 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.14), 0 6px 20px rgba(0, 0, 0, 0.2);
             opacity: 0.9;
         }
     </style>
@@ -67,7 +68,7 @@
     <div id="particles-js"></div>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <a class="navbar-brand" href="/">
             <img src="{% static 'logo.jpeg' %}" alt="Logo" style="width: 60px; height: 60px; margin-right: 10px; margin-left: 20px;">
             洽兴成本报价</a>
@@ -77,7 +78,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a href="/admin/" class="nav-link fa-solid fa-user">管理员</a>
+                    <a href="/admin/" class="nav-link fa-solid fa-user">登录</a>
                 </li>
             </ul>
         </div>
@@ -108,7 +109,7 @@
         const urlMappings = {
           塑料成品: "/calculate/suliao",
           注塑: "/calculate/zhusu",
-          喷涂: "/calculate/penwu",
+          喷涂: "/calculate/pentu",
           电镀: "/calculate/diandu",
           烫金: "/calculate/tangjin",
           印刷: "/calculate/yinshua",
