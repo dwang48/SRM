@@ -1,17 +1,64 @@
-<div id="additional-fields">
-  <label style="font-size: 20px; margin-bottom: 10px">计算产能</label>
-  <div class="horizontal-input-group">
-    <div class="input-wrapper">
-      <label class="input-label">模具穴数</label>
-      <input type="number" id="mould_cavity" placeholder="" required />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">成型时间(秒)</label>
-      <input type="number" id="forming_time" placeholder="" required />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">稼动率</label>
-      <input type="float" id="utilization_rate" placeholder="" required />
+<div class="accordion-item">
+  <h2 class="accordion-header" id="productionheading">
+    <button
+      class="accordion-button"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#collapseProductionParameters"
+      aria-expanded="true"
+      aria-controls="collapseProductionParameters"
+    >
+      产量计算
+    </button>
+  </h2>
+  <div
+    id="collapseProductionParameters"
+    class="accordion-collapse collapse show"
+    aria-labelledby="productionheading"
+    data-bs-parent="#calculationAccordion"
+  >
+    <div
+      id="collapseOne"
+      class="collapse show"
+      aria-labelledby="productionheading"
+      data-parent="#productionAccordion"
+    >
+      <div class="card-body">
+        <div id="additional-fields">
+          <div class="horizontal-input-group">
+            <div class="input-wrapper">
+              <label class="input-label">模具穴数</label>
+              <input
+                class="form-control"
+                type="number"
+                id="mould_cavity"
+                placeholder=""
+                required
+              />
+            </div>
+            <div class="input-wrapper">
+              <label class="input-label">成型时间(秒)</label>
+              <input
+                class="form-control"
+                type="number"
+                id="forming_time"
+                placeholder=""
+                required
+              />
+            </div>
+            <div class="input-wrapper">
+              <label class="input-label">稼动率</label>
+              <input
+                class="form-control"
+                type="float"
+                id="utilization_rate"
+                placeholder=""
+                required
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

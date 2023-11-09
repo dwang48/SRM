@@ -5,10 +5,10 @@
 /* VARIABLE DEFINITIONS */
 html[data-theme="light"],
 :root {
-    --primary: #79aec8;
-    --secondary: #417690;
+    --primary: rgb(0, 0, 0);
+    --secondary: #000000;
     --accent: #f5dd5d;
-    --primary-fg: #fff;
+    --primary-fg: #000000;
 
     --body-fg: #333;
     --body-bg: #fff;

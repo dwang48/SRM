@@ -40,9 +40,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = '/static/'
 
 # 指定simpleui默认的主题,指定一个文件名，相对路径就从simpleui的theme目录读取
-# SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'
+SIMPLEUI_DEFAULT_THEME = 'admin.lte.css'
 
-# SIMPLEUI_LOGO = 'images/logo.jpeg'
+SIMPLEUI_LOGO = 'images/logo.jpeg'
 SIMPLEUI_HOME_INFO=False
 SIMPLEUI_ANALYSIS = False
 SIMPLEUI_LOGO = '/static/images/shyahsin.jpeg'
@@ -50,7 +50,7 @@ SIMPLEUI_LOGO = '/static/images/shyahsin.jpeg'
 # ALLOWED_HOSTS = ['cold-bugs-thank.loca.lt', 'localhost', '127.0.0.1','c39a-106-11-200-10.ngrok-free.app']
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://cold-bugs-thank.loca.lt','https://c39a-106-11-200-10.ngrok-free.app']
+# CSRF_TRUSTED_ORIGINS = ['https://cold-bugs-thank.loca.lt','https://c39a-106-11-200-10.ngrok-free.app']
 
 SIMPLEUI_DEFAULT_ICON = True
 SIMPLEUI_HOME_QUICK=True
@@ -62,7 +62,8 @@ SIMPLEUI_INDEX = '/'
 
 
 INSTALLED_APPS = [
-    "simpleui",
+    "myproject",
+    # "simpleui",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -76,6 +77,7 @@ INSTALLED_APPS = [
     "material_price_info",
     "cost_analysis",
     "home",
+    "product",
 ]
 
 MIDDLEWARE = [
@@ -94,7 +96,7 @@ ROOT_URLCONF = "myproject.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

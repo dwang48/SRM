@@ -1,0 +1,83 @@
+<!-- <div class="horizontal-input-group">
+    <div class="input-wrapper">
+        <label class="input-label" for="lineSpeed">线速度（米/分钟）：</label>
+        <input class="form-control" type="number" id="lineSpeed" value="6.5" oninput="calculateProduction()" />
+    </div>
+
+    <div class="input-wrapper">
+        <label class="input-label" for="stationCount">工位数量（工位/个产品）：</label>
+        <input class="form-control" type="number" id="stationCount" value="2" oninput="calculateProduction()" />
+    </div>
+
+    <div class="input-wrapper">
+        <label class="input-label" for="stationDistance">工位距（毫米）：        </label>  <br>
+        <input class="form-control" type="number" id="stationDistance" value="38.1" oninput="calculateProduction()" />
+    </div>
+</div>
+
+<div class="horizontal-input-group">
+    <div class="input-wrapper">
+        <label class="input-label" for="operatingRate">稼动率：</label>
+        <input class="form-control" type="number" id="operatingRate" value="0.8" step="0.01" oninput="calculateProduction()" />
+    </div>
+
+    <div class="input-wrapper">
+        <label class="input-label" for="productionResult">每天产量：</label>
+        <input class="form-control" type="text" id="productionResult" readonly />
+    </div>
+</div> -->
+<div class="accordion-item">
+    <h2 class="accordion-header" id="productionheading">
+      <button
+        class="accordion-button"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseProductionParameters"
+        aria-expanded="true"
+        aria-controls="collapseProductionParameters"
+      >
+        产量计算
+      </button>
+    </h2>
+    <div
+      id="collapseProductionParameters"
+      class="accordion-collapse collapse show"
+      aria-labelledby="productionheading"
+      data-bs-parent="#calculationAccordion"
+    >
+  
+      <div id="collapseOne" class="collapse show" aria-labelledby="productionheading" data-parent="#productionAccordion">
+        <div class="card-body">
+          <div class="horizontal-input-group">
+              <div class="input-wrapper">
+                  <label class="input-label" for="lineSpeed">线速度（米/分钟）：</label>
+                  <input class="form-control" type="number" id="lineSpeed" value="6.5" oninput="calculateProduction()" />
+              </div>
+  
+              <div class="input-wrapper">
+                  <label class="input-label" for="stationCount">工位数量（工位/个产品）：</label>
+                  <input class="form-control" type="number" id="stationCount" value="2" oninput="calculateProduction()" />
+              </div>
+  
+              <div class="input-wrapper">
+                  <label class="input-label" for="stationDistance">工位距（毫米）：</label>
+                  <input class="form-control" type="number" id="stationDistance" value="38.1" oninput="calculateProduction()" />
+              </div>
+          </div>
+
+          <div class="horizontal-input-group">
+              <div class="input-wrapper">
+                  <label class="input-label" for="operatingRate">稼动率：</label>
+                  <input class="form-control" type="number" id="operatingRate" value="0.8" step="0.01" oninput="calculateProduction()" />
+              </div>
+  
+              <div class="input-wrapper">
+                  <label class="input-label" for="productionResult">每天产量：</label>
+                  <input class="form-control" type="text" id="productionResult" readonly />
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

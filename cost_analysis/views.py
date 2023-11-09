@@ -217,17 +217,29 @@ def calculate_cost(request):
     profit = 0
     total_cost = 0
     material_coefficient = 1
+    additional_packaging_cost = 0
+    additional_material_cost = 0
+    additional_process_cost = 0
+    additional_transport_cost = 0
+    
     # selected_methods = []
     management_fee_percentage = 0
     profit_margin_percentage = 0
+
+    if category_name == "抛光和氧化":
+        search_categories = ["抛光", "氧化"]
+    elif category_name == "冲压抛光氧化":
+        search_categories = ["冲压", "抛光", "氧化"]
+    else:
+        search_categories = [category_name]
     
-    products = Product.objects.filter(categories=category_name)
+    products = Product.objects.filter(categories__in=search_categories)
     # products = Product.objects.all()
     # Equipments = Equipment.objects.all()
-    manufacturing_process = Equipment.objects.filter(category=category_name).values_list('manufacturing_process',flat=True).distinct()
+    manufacturing_process = Equipment.objects.filter(category__in=search_categories).values_list('manufacturing_process',flat=True).distinct()
     # manufacturing_process = Equipment.objects.values_list('manufacturing_process',flat=True).distinct()
     manufacturing_data = []
-    all_materials = ModelClass.objects.filter(categories=category_name)
+    all_materials = ModelClass.objects.filter(categories__in=search_categories)
 
     for process in manufacturing_process:
         process_data = {
@@ -253,15 +265,22 @@ def calculate_cost(request):
         manufacturing_data.append(process_data)
 
     if request.method == "POST":
-        additional_material_cost = float(request.POST.get('additional_material_cost', 0))
-        additional_packaging_cost = float(request.POST.get('additional_packaging_cost', 0))
-        additional_transport_cost = float(request.POST.get('additional_transport_cost', 0))
-        additional_process_cost = float(request.POST.get('additional_process_cost', 0))
+        additional_material_cost = float(request.POST.get('additional_material_cost_per_item', 0))
+        print("额外材料费:" + str(additional_material_cost))
+        additional_packaging_cost = float(request.POST.get('additional_packaging_cost_per_item', 0))
+        print("额外包装费:" + str(additional_packaging_cost))
+        additional_transport_cost = float(request.POST.get('additional_transport_cost_per_item', 0))
+        print("额外交通费:" + str(additional_transport_cost))
+        additional_process_cost = float(request.POST.get('additional_process_cost_per_item', 0))
+        print("额外加工费:" + str(additional_process_cost))
         selected_product_id = request.POST.get('selected_product')
         product_info = Product.objects.get(id=selected_product_id)
         # vendor_info = Vendor.objects.get(supplier_name=product_info.supplier)
         material_info = ModelClass.objects.get(material_name=product_info.material_name,material_grade = product_info.material_grade)
-        material_coefficient = float(request.POST.get('material_coefficient'))
+        if request.POST.get('material_coefficient')== None:
+            material_coefficient = 1
+        else:
+            material_coefficient = float(request.POST.get('material_coefficient'))
         # selected_material = request.POST.get('selected_material')
 
         product_gross_weight = product_info.part_gross_weight
@@ -320,7 +339,7 @@ def calculate_cost(request):
         total_cost = round(total_cost,4)
 
         
-    if category in ['zhusu','pentu']:
+    if category in ['zhusu','pentu','chuizhong','chongya','chongya_yanghua','chongya_yanghua_paoguang']:
         template_name = f"cost_analysis/calculate_{category}.html"
     else:
         template_name = "cost_analysis/calculate.html"
@@ -337,7 +356,11 @@ def calculate_cost(request):
         'managing_result':managing_result,
         'profit':profit,
         'material_coefficient': material_coefficient,
-        "all_materials": all_materials
+        "all_materials": all_materials,
+        'additional_material_cost':additional_material_cost,
+        'additional_packaging_cost': additional_packaging_cost,
+        'additional_process_cost': additional_process_cost,
+        'additional_transport_cost':additional_transport_cost,
     })
 
 

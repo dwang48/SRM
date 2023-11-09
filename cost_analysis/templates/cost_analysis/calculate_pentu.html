@@ -1,205 +1,233 @@
 {% extends "cost_analysis/calculate.html" %} 
-{% block calculation_card %}
-<div class="form-group">
-  <label for="maxRotationDiameter">产品横面最大旋转直径 (mm):</label>
-  <input
-    type="number"
-    class="form-control"
-    id="maxRotationDiameter"
-    name="maxRotationDiameter"
-    placeholder="请输入直径"
-    step="0.01"
-  />
+{% load static %} 
+{% block calculation_card %} 
+{% include "cost_analysis/components/daily_capacity.html" %}
+<div class="accordion" id="calculationAccordion">
+  <!-- Section 1: 产品参数 -->
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="ProcuctParameters">
+      <button
+        class="accordion-button"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseProductParameters"
+        aria-expanded="true"
+        aria-controls="collapseProductParameters"
+      >
+        产品参数
+      </button>
+    </h2>
+    <div
+      id="collapseProductParameters"
+      class="accordion-collapse collapse show"
+      aria-labelledby="ProductParamters"
+      data-bs-parent="#calculationAccordion"
+    >
+      <div class="accordion-body">
+        <div class="form-group">
+          <label for="maxRotationDiameter">产品横面最大旋转直径 (mm):</label>
+          <input
+            type="number"
+            class="form-control"
+            id="maxRotationDiameter"
+            name="maxRotationDiameter"
+            placeholder="请输入直径"
+            step="0.01"
+          />
+        </div>
+        <div class="form-group">
+          <label for="maxSideDiameter">产品侧面最大直径 (mm):</label>
+          <input
+            type="number"
+            class="form-control"
+            id="maxSideDiameter"
+            name="maxSideDiameter"
+            placeholder="请输入直径"
+            step="0.01"
+          />
+        </div>
+      </div>
+    
+
+    <!-- 处理剂枪组 -->
+    <label style="font-size: 20px; margin-bottom: 10px">处理剂</label>
+    <div class="horizontal-input-group">
+      <div class="input-wrapper">
+        <label class="input-label">处理剂枪数:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="treatmentGunCount"
+          readonly
+        />
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">每枪日消耗量:</label>
+        <input
+          type="number"
+          class="form-control"
+          id="treatmentDailyConsumption"
+          onchange="calculateTotalCost();"
+          value="36"
+        />
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">单价:</label>
+        <input
+          type="number"
+          class="form-control"
+          id="treatmentUnitPrice"
+          onchange="calculateTotalCost();"
+        />
+      </div>
+    </div>
+
+    <!-- 底漆枪组 -->
+    <label style="font-size: 20px; margin-bottom: 10px">底漆枪</label>
+    <div class="horizontal-input-group">
+      <div class="input-wrapper">
+        <label class="input-label">底漆枪数:</label>
+        <input type="text" class="form-control" id="primerGunCount" readonly />
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">每枪日消耗量:</label>
+        <input
+          type="number"
+          class="form-control"
+          id="primerDailyConsumption"
+          onchange="calculateTotalCost();"
+          value="40"
+        />
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">单价:</label>
+        <input
+          type="number"
+          class="form-control"
+          id="primerUnitPrice"
+          onchange="calculateTotalCost();"
+        />
+      </div>
+    </div>
+
+    <!-- 中途漆枪组 -->
+    <label style="font-size: 20px; margin-bottom: 10px">中途漆枪</label>
+    <div class="horizontal-input-group">
+      <div class="input-wrapper">
+        <label class="input-label">中途漆枪数:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="midwayPaintGunCount"
+          readonly
+        />
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">每枪日消耗量:</label>
+        <input
+          type="number"
+          class="form-control"
+          id="midwayDailyConsumption"
+          onchange="calculateTotalCost();"
+          value="36"
+        />
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">单价:</label>
+        <input
+          type="number"
+          class="form-control"
+          id="midwayUnitPrice"
+          onchange="calculateTotalCost();"
+        />
+      </div>
+    </div>
+
+    <!-- 面漆枪组 -->
+    <label style="font-size: 20px; margin-bottom: 10px">面漆枪</label>
+    <div class="horizontal-input-group">
+      <div class="input-wrapper">
+        <label class="input-label">面漆枪数:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="surfacePaintGunCount"
+          readonly
+        />
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">每枪日消耗量:</label>
+        <input
+          type="number"
+          class="form-control"
+          id="surfaceDailyConsumption"
+          onchange="calculateTotalCost();"
+          value="40"
+        />
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">单价:</label>
+        <input
+          type="number"
+          class="form-control"
+          id="surfaceUnitPrice"
+          onchange="calculateTotalCost();"
+        />
+      </div>
+    </div>
+
+    <label style="font-size: 20px; margin-bottom: 10px">色精</label>
+    <div class="horizontal-input-group">
+      <div class="input-wrapper">
+        <label class="input-label">色精单价:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="colorantUnitPrice"
+          onchange="calculateTotalCost();"
+        />
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">色精日消耗量:</label>
+        <input
+          type="number"
+          class="form-control"
+          id="colorantDailyConsumption"
+          onchange="calculateTotalCost();"
+          readonly
+        />
+      </div>
+      <div class="input-wrapper">
+        <label class="input-label">使用比例(%):</label>
+        <input
+          type="number"
+          class="form-control"
+          id="usageRatio"
+          onchange="calculateTotalCost();"
+        />
+      </div>
+    </div>
+    
+
+    <!-- 总原料费用 -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="form-group">
+          <label for="totalCost">总原料费用:</label>
+          <input type="text" class="form-control" id="totalCost" readonly />
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
 </div>
-
-<div class="form-group">
-  <label for="maxSideDiameter">产品侧面最大直径 (mm):</label>
-  <input
-    type="number"
-    class="form-control"
-    id="maxSideDiameter"
-    name="maxSideDiameter"
-    placeholder="请输入直径"
-    step="0.01"
-  />
-</div>
-
-<!-- Display fields for the number of guns -->
-<!-- 枪类输入字段 -->
-<div class="row">
-  <label style="font-size: 20px; margin-bottom: 10px">处理枪</label>
-
-  <!-- 处理剂枪组 -->
-  <div class="horizontal-input-group">
-    <div class="input-wrapper">
-      <label class="input-label">处理剂枪数:</label>
-      <input type="text" class="form-control" id="treatmentGunCount" readonly />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">每枪日消耗量:</label>
-      <input
-        type="number"
-        class="form-control"
-        id="treatmentDailyConsumption"
-        onchange="calculateTotalCost();"
-        value="36"
-      />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">单价:</label>
-      <input
-        type="number"
-        class="form-control"
-        id="treatmentUnitPrice"
-        onchange="calculateTotalCost();"
-      />
-    </div>
-  </div>
-
-  <!-- 底漆枪组 -->
-  <label style="font-size: 20px; margin-bottom: 10px">底漆枪</label>
-  <div class="horizontal-input-group">
-    <div class="input-wrapper">
-      <label class="input-label">底漆枪数:</label>
-      <input type="text" class="form-control" id="primerGunCount" readonly />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">每枪日消耗量:</label>
-      <input
-        type="number"
-        class="form-control"
-        id="primerDailyConsumption"
-        onchange="calculateTotalCost();"
-        value="40"
-      />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">单价:</label>
-      <input
-        type="number"
-        class="form-control"
-        id="primerUnitPrice"
-        onchange="calculateTotalCost();"
-      />
-    </div>
-  </div>
-
-  <!-- 中途漆枪组 -->
-  <label style="font-size: 20px; margin-bottom: 10px">中途漆枪</label>
-  <div class="horizontal-input-group">
-    <div class="input-wrapper">
-      <label class="input-label">中途漆枪数:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="midwayPaintGunCount"
-        readonly
-      />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">每枪日消耗量:</label>
-      <input
-        type="number"
-        class="form-control"
-        id="midwayDailyConsumption"
-        onchange="calculateTotalCost();"
-        value="36"
-      />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">单价:</label>
-      <input
-        type="number"
-        class="form-control"
-        id="midwayUnitPrice"
-        onchange="calculateTotalCost();"
-      />
-    </div>
-  </div>
-
-  <!-- 面漆枪组 -->
-  <label style="font-size: 20px; margin-bottom: 10px">面漆枪</label>
-  <div class="horizontal-input-group">
-    <div class="input-wrapper">
-      <label class="input-label">面漆枪数:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="surfacePaintGunCount"
-        readonly
-      />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">每枪日消耗量:</label>
-      <input
-        type="number"
-        class="form-control"
-        id="surfaceDailyConsumption"
-        onchange="calculateTotalCost();"
-        value="40"
-      />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">单价:</label>
-      <input
-        type="number"
-        class="form-control"
-        id="surfaceUnitPrice"
-        onchange="calculateTotalCost();"
-      />
-    </div>
-  </div>
-
-  <label style="font-size: 20px; margin-bottom: 10px">色精</label>
-  <div class="horizontal-input-group">
-    <div class="input-wrapper">
-      <label class="input-label">色精单价:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="essenseGunCount"
-        onchange="calculateTotalCost();"
-      />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">每枪日消耗量:</label>
-      <input
-        type="number"
-        class="form-control"
-        id="essenseDailyConsumption"
-        onchange="calculateTotalCost();"
-        readonly
-      />
-    </div>
-    <div class="input-wrapper">
-      <label class="input-label">使用比例(%):</label>
-      <input
-        type="number"
-        class="form-control"
-        id="usageRatio"
-        onchange="calculateTotalCost();"
-      />
-    </div>
-  </div>
-</div>
-
-<!-- 总原料费用 -->
-<div class="row">
-  <div class="col-md-12">
-    <div class="form-group">
-      <label for="totalCost">总原料费用:</label>
-      <input type="text" class="form-control" id="totalCost" readonly />
-    </div>
-  </div>
-</div>
-
-
-{% include "cost_analysis/components/labor_fee.html" %}
-
+{% include "cost_analysis/components/labor_fee.html" %} 
+{% include "cost_analysis/components/environment_cost.html" %} 
+{% endblock %} 
 {% block scripts %}
+<script src="{% static 'js/gun.js' %}"></script>
+<script src="{% static 'js/labor_cost.js' %}"></script>
+<script src="{% static 'js/daily_capacity.js' %}"></script>
+<script src="{% static 'js/additional.js' %}"></script>
 
 {% endblock %}
-
-{% endblock %}
-
-

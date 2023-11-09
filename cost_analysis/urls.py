@@ -39,7 +39,7 @@ from cost_analysis import views
 # ]
 categories = [
     'suliao', 'zhusu', 'pentu', 'diandu', 'tangjin', 'yinshua',
-    'penhui', 'zuzhuang', 'chongya', 'paoguang', 'yanghua', 'suanxi',
+    'penhui', 'zuzhuang', 'chongya', 'paoguang_yanghua', 'chongya_paoguang_yanghua', 'suanxi',
     'kezi', 'citie', 'chuizhong', 'tanhuan', 'lvjianchengpin', 'zhanban',
     'zhixiang', 'baozhuangdai', 'caihe', 'xisupan', 'zhuanyinzhi', 
     'dianpian', 'bozhi', 'biaoqian', 'shousuomo', 'mojia', 'moxin',
